@@ -1,0 +1,15 @@
+{
+  "name": "sportily-angular-registration",
+  "version": "0.1.0",
+  "authors": [
+    "Craig Smith <craig@mudslidedesign.co.uk>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

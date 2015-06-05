@@ -1,0 +1,106 @@
+<form>
+
+    <h1>Registration</h1>
+
+    <div class="form-group">
+        <label for="given_name">Name</label>
+        <div class="form-inline">
+            <input type="text" class="form-control form-control-xs" id="given_name" ng-model="person.given_name" placeholder="First Name"/>
+            <input type="text" class="form-control form-control-sm" id="family_name" ng-model="person.family_name" size="40" placeholder="Surname"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="email_address">Email Address</label>
+        <input type="text" class="form-control" id="email_address" ng-model="user.email_address"/>
+        <p class="help-block">Email address will <em>never</em> be shown publicly.</p>
+    </div>
+
+    <div class="form-group">
+        <label for="email_address_confirm">Confirm Email Address</label>
+        <input type="text" class="form-control" id="email_address_confirm" ng-model="user.email_address_confirm"/>
+    </div>
+
+    <div class="form-group">
+        <label for="medical_conditions">Medical Conditions</label>
+        <input type="text" class="form-control" id="medical_conditions" ng-model="person.medical_conditions"/>
+        <p class="help-block">If none, please state “None”.</p>
+    </div>
+
+    <div class="form-group">
+        <label for="date_of_birth">Date of Birth</label>
+        <input type="text" class="form-control form-control-xs" id="date_of_birth" ng-model="person.date_of_birth" placeholder="dd/mm/yyyy"/>
+    </div>
+
+    <h2>League Roles</h2>
+
+    <div class="form-group">
+        <div class="form-inline form-group form-role" ng-repeat="role in roles">
+
+            <label>Role #{{ $index + 1 }}:</label>
+
+            <div class="form-group">
+                <select class="form-control"
+                    ng-options="o.id as o.name for o in organisations"
+                    ng-model="role.organisation_id">
+                    <option value="">Region&hellip;</option>
+                </select>
+            </div>
+
+            <div class="form-group" ng-show="role.organisation_id">
+                <select class="form-control"
+                    ng-options="key as label for (key, label) in types"
+                    ng-model="role.type">
+                    <option value="">Role&hellip;</option>
+                </select>
+            </div>
+
+            <div class="form-group" ng-show="role.organisation_id && ['player','manager'].indexOf(role.type) !== -1">
+                <span>for &nbsp;</span>
+                <select class="form-control"
+                    ng-options="team.id as team.name + ' (' + ageGroups[team.age_group_id] + ')' for team in teams|filter:{organisation_id:role.organisation_id}"
+                    ng-model="role.team_id">
+                    <option value="">Team&hellip;</option>
+                </select>
+            </div>
+
+            <a ng-click="addRole()" ng-if="$last && role.organisation_id && role.type">More roles&hellip;</a>
+
+        </div>
+    </div>
+
+    <h2>Contact Details</h2>
+
+    <div class="form-group">
+        <label for="street_address">Street Address</label>
+        <input type="text" class="form-control" id="street_address" ng-model="person.street_address"/>
+    </div>
+
+    <div class="form-group">
+        <label for="city">Town/City</label>
+        <input type="text" class="form-control form-control-sm" id="city" ng-model="person.city"/>
+    </div>
+
+    <div class="form-group">
+        <label for="province">County</label>
+        <input type="text" class="form-control form-control-sm" id="province" ng-model="person.province"/>
+    </div>
+
+    <div class="form-group">
+        <label for="postcode">Postcode</label>
+        <input type="text" class="form-control form-control-sm" id="postcode" ng-model="person.postcode"/>
+    </div>
+
+    <div class="form-group">
+        <label for="phone_number">Phone Number</label>
+        <input type="text" class="form-control form-control-sm" id="phone_number" ng-model="person.phone_number"/>
+    </div>
+
+    <div class="form-group">
+        <label for="mobile_number">Mobile Number</label>
+        <input type="text" class="form-control form-control-sm" id="mobile_number" ng-model="person.mobile_number"/>
+    </div>
+
+    <button class="btn btn-primary" ng-click="save()">Register</button>
+
+</form>
