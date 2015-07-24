@@ -1,18 +1,18 @@
 (function() {
   var module;
 
-  module = angular.module('sportily.registration', ['sportily.registration.controller', 'sportily.registration.directive', 'sportily.registration.filters', 'sportily.registration.templates']);
+  module = angular.module('sportily.registration', ['sportily.registration.controller', 'sportily.registration.directive', 'sportily.registration.filters', 'sportily.registration.templates', 'sportily.registration.forms']);
 
 }).call(this);
 
 (function() {
   var module;
 
-  module = angular.module('sportily.registration.controller', ['sportily.api']);
+  module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.types']);
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'AgeGroups', 'Members', 'Organisations', 'People', 'Roles', 'Teams', 'Users', function($scope, $q, AgeGroups, Members, Organisations, People, Roles, Teams, Users) {
-      var fetchAgeGroups, fetchOrganisations, fetchTeams, saveMember, savePerson, saveRoles, saveUser;
+    '$scope', '$q', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
+      var fetchAgeGroups, fetchCompetitions, fetchTeams, saveMember, savePerson, saveRoles, saveUser;
       $scope.user = {};
       $scope.person = {};
       $scope.member = {
@@ -26,11 +26,7 @@
       $scope.state = {
         dateOfBirth: null
       };
-      $scope.types = {
-        player: 'Player',
-        manager: 'Manager',
-        official: 'Official'
-      };
+      $scope.types = Types;
       $scope.addRole = function() {
         return $scope.roles.push({
           type: null
@@ -44,13 +40,14 @@
       $scope.save = function() {
         return saveUser().then(savePerson).then(saveMember).then(saveRoles);
       };
-      fetchOrganisations = function() {
+      fetchCompetitions = function() {
         var filter;
         filter = {
-          registration_id: $scope.registrationId
+          season_id: $scope.seasonId,
+          include: 'organisation'
         };
-        return Organisations.getList(filter).then(function(organisations) {
-          return $scope.organisations = organisations;
+        return Competitions.getList(filter).then(function(competitions) {
+          return $scope.competitions = competitions;
         });
       };
       fetchAgeGroups = function() {
@@ -65,7 +62,7 @@
       fetchTeams = function() {
         var filter;
         filter = {
-          registration_id: $scope.registrationId
+          season_id: $scope.seasonId
         };
         return Teams.getList(filter).then(function(teams) {
           return $scope.teams = teams;
@@ -97,7 +94,7 @@
           return Roles.post(role);
         });
       };
-      fetchOrganisations();
+      fetchCompetitions();
       fetchAgeGroups();
       return fetchTeams();
     }
@@ -114,7 +111,7 @@
     return {
       restrict: 'E',
       controller: 'SportilyRegistrationCtrl',
-      templateUrl: 'templates/sportily/registration/registration.html',
+      templateUrl: 'templates/sportily/registration/form.html',
       scope: {
         registrationId: '@registration',
         seasonId: '@season'
@@ -137,6 +134,145 @@
         });
       });
     };
+  });
+
+  module.filter('forCompetition', function() {
+    return function(teams, id) {
+      return _.filter(teams, function(team) {
+        return _.some(team.competitions.data, {
+          id: id
+        });
+      });
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var module;
+
+  module = angular.module('sportily.registration.forms', []);
+
+  String.prototype.ucfirst = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  };
+
+  module.directive('serverError', function() {
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      scope: {
+        model: '=ngModel'
+      },
+      link: function(scope, element, attrs, ngModel) {
+        return scope.$watch('model', function() {
+          return _.each(ngModel.$error, function(value, key) {
+            if (key.startsWith('validation.')) {
+              return ngModel.$setValidity(key, true);
+            }
+          });
+        });
+      }
+    };
+  });
+
+  module.directive('errors', function() {
+    return {
+      restrict: 'E',
+      require: ['^form', '^field'],
+      templateUrl: 'templates/sportily/registration/errors.html'
+    };
+  });
+
+  module.directive('info', function() {
+    return {
+      restrict: 'E',
+      require: ['^form', '^field'],
+      transclude: true,
+      templateUrl: 'templates/sportily/registration/info.html',
+      scope: true,
+      link: function(scope, element, attrs, ctrl) {
+        scope.form = ctrl[0];
+        return scope.name = ctrl[1].name();
+      }
+    };
+  });
+
+  module.directive('field', function() {
+    return {
+      restrict: 'E',
+      require: '^form',
+      transclude: true,
+      templateUrl: 'templates/sportily/registration/field.html',
+      scope: {
+        name: '@',
+        label: '@'
+      },
+      link: function(scope, element, attrs, form) {
+        scope.form = form;
+        if (!scope.label && scope.label !== '') {
+          return scope.displayLabel = scope.name.ucfirst().replace('_', ' ');
+        } else {
+          return scope.displayLabel = scope.label;
+        }
+      },
+      controller: [
+        '$scope', function($scope) {
+          this.name = function() {
+            return $scope.name;
+          };
+          this.label = function() {
+            return $scope.label;
+          };
+        }
+      ]
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var module;
+
+  module = angular.module('sportily.registration.types', []);
+
+  module.constant('Types', {
+    player: {
+      name: 'Player',
+      requiresTeam: true
+    },
+    player_training: {
+      name: 'Player (Training)',
+      requiresTeam: true
+    },
+    player_recreational: {
+      name: 'Player (Recreational)',
+      requiresTeam: true
+    },
+    manager: {
+      name: 'Manager',
+      requiresTeam: true
+    },
+    coach: {
+      name: 'Coach',
+      requiresTeam: true
+    },
+    referee: {
+      name: 'Referee'
+    },
+    timekeeper: {
+      name: 'Timekeeper'
+    },
+    official: {
+      name: 'Non-Bench Official'
+    },
+    committee: {
+      name: 'Regional Committee'
+    },
+    parent: {
+      name: 'Parent',
+      requiresTeam: true
+    }
   });
 
 }).call(this);

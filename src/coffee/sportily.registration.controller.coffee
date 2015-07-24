@@ -1,5 +1,6 @@
 module = angular.module 'sportily.registration.controller', [
     'sportily.api'
+    'sportily.registration.types'
 ]
 
 
@@ -7,23 +8,21 @@ module.controller 'SportilyRegistrationCtrl', [
     '$scope'
     '$q'
     'AgeGroups'
+    'Competitions'
     'Members'
-    'Organisations'
     'People'
     'Roles'
     'Teams'
+    'Types'
     'Users'
 
-    ($scope, $q, AgeGroups, Members, Organisations, People, Roles, Teams, Users) ->
+    ($scope, $q, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) ->
         $scope.user = {}
         $scope.person = {}
         $scope.member = season_id: $scope.seasonId
         $scope.roles = [ type: null ]
         $scope.state = dateOfBirth: null
-        $scope.types =
-            player: 'Player'
-            manager: 'Manager'
-            official: 'Official'
+        $scope.types = Types
 
 
         ##
@@ -54,10 +53,10 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Fetch a list of all the organisations for the current registration
         ## period.
         ##
-        fetchOrganisations = ->
-            filter = registration_id: $scope.registrationId
-            Organisations.getList(filter).then (organisations) ->
-                $scope.organisations = organisations
+        fetchCompetitions = ->
+            filter = season_id: $scope.seasonId, include: 'organisation'
+            Competitions.getList(filter).then (competitions) ->
+                $scope.competitions = competitions
 
 
         ##
@@ -73,7 +72,7 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Fetch a list of all the teams for the current registration period.
         ##
         fetchTeams = ->
-            filter = registration_id: $scope.registrationId
+            filter = season_id: $scope.seasonId
             Teams.getList(filter).then (teams) ->
                 $scope.teams = teams
 
@@ -122,7 +121,7 @@ module.controller 'SportilyRegistrationCtrl', [
 
 
         # initialise the scope with necessary data.
-        fetchOrganisations()
+        fetchCompetitions()
         fetchAgeGroups()
         fetchTeams()
 ]

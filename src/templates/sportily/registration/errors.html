@@ -1,0 +1,18 @@
+<p class="help-block error"
+    ng-if="form[name].$touched"
+    ng-repeat="(key, value) in form[name].$error"
+    ng-switch="key">
+
+    <!-- client-side -->
+    <span ng-switch-when="email">Invalid email address</span>
+    <span ng-switch-when="required">Required field</span>
+
+    <!-- server-side -->
+    <span ng-switch-when="validation.email">Invalid email address</span>
+    <span ng-switch-when="validation.required">Required field</span>
+    <span ng-switch-when="validation.unique">{{:: label }} is already taken</span>
+
+    <!-- default for any we missed -->
+    <span ng-switch-default>{{:: key }}</span>
+
+</p>

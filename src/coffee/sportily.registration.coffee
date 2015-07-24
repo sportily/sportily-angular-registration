@@ -3,4 +3,5 @@ module = angular.module 'sportily.registration', [
     'sportily.registration.directive'
     'sportily.registration.filters'
     'sportily.registration.templates'
+    'sportily.registration.forms'
 ]

@@ -1,0 +1,38 @@
+<h3>League Roles</h3>
+
+<div class="form-inline form-group" ng-repeat="role in roles">
+
+    <label>Role #{{ $index + 1 }}:</label>
+
+    <div class="form-group">
+        <select class="form-control"
+            ng-options="c.id as c.organisation.name for c in competitions"
+            ng-model="role.competition_id">
+            <option value="">Region&hellip;</option>
+        </select>
+    </div>
+
+    <div class="form-group" ng-show="role.competition_id">
+        <select class="form-control"
+            ng-options="key as type.name for (key, type) in types"
+            ng-model="role.type">
+            <option value="">Role&hellip;</option>
+        </select>
+    </div>
+
+    <div class="form-group" ng-show="role.competition_id && types[role.type].requiresTeam">
+        <span>for</span>
+        <select class="form-control"
+            ng-options="team.id as team.name + ' (' + ageGroups.lookup[team.age_group_id].name + ')' for team in teams|forCompetition:role.competition_id"
+            ng-model="role.team_id">
+            <option value="">Team&hellip;</option>
+        </select>
+    </div>
+
+    <a ng-click="removeRole(role)" ng-if="roles.length > 1">Remove</a>
+
+</div>
+
+<div class="form-group">
+    <button class="btn btn-default" ng-click="addRole()">Add more roles&hellip;</button>
+</div>

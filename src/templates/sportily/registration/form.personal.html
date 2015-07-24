@@ -1,0 +1,42 @@
+<h3>Personal Details</h3>
+
+<!-- name -->
+<div class="form-group form-group-name">
+    <field name="given_name" label="Name" class="form-group">
+        <input type="text" class="form-control"
+            name="given_name"
+            ng-model="person.given_name"
+            placeholder="Forename"
+            required
+            autofocus
+            server-error>
+    </field>
+    <field name="family_name" label="" class="form-group">
+        <input type="text" class="form-control"
+            name="family_name"
+            ng-model="person.family_name"
+            placeholder="Surname"
+            required
+            server-error>
+    </field>
+</div>
+
+<!-- date of birth -->
+<field name="date_of_birth">
+    <input type="date" class="form-control"
+        name="date_of_birth"
+        ng-model="state.dateOfBirth"
+        required
+        server-error>
+</field>
+
+<!-- medical conditions -->
+<field name="medical_conditions">
+    <input type="text" class="form-control"
+        name="medical_conditions"
+        ng-model="person.medical_conditions"
+        placeholder="e.g. Asthma"
+        required
+        server-error>
+    <info>If member has no relevant medical conditions, please indicate 'None'.</info>
+</field>
