@@ -8,10 +8,10 @@
 (function() {
   var module;
 
-  module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.types']);
+  module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.types', 'sportily.registration.forms']);
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
+    '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
       var fetchAgeGroups, fetchCompetitions, fetchTeams, saveMember, savePerson, saveRoles, saveUser;
       $scope.user = {};
       $scope.person = {};
@@ -27,6 +27,7 @@
         dateOfBirth: null
       };
       $scope.types = Types;
+      $scope.complete = false;
       $scope.addRole = function() {
         return $scope.roles.push({
           type: null
@@ -38,7 +39,9 @@
         });
       };
       $scope.save = function() {
-        return saveUser().then(savePerson).then(saveMember).then(saveRoles);
+        return Form.isValid($scope).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(function() {
+          return $scope.complete = true;
+        })["catch"](Form.showErrors($scope));
       };
       fetchCompetitions = function() {
         var filter;
@@ -229,6 +232,33 @@
     };
   });
 
+  module.factory('Form', function($window, $q) {
+    return {
+      showErrors: function(scope) {
+        return function(response) {
+          $window.scrollTo(0, 0);
+          if (response.data) {
+            scope.error = response.data.error_description;
+            return _.each(response.data.validation_messages, function(errors, key) {
+              return _.each(errors, function(error) {
+                return scope.form[key].$setValidity(error, false);
+              });
+            });
+          } else {
+            return scope.error = response;
+          }
+        };
+      },
+      isValid: function(scope) {
+        if (scope.form.$valid) {
+          return $q.when();
+        } else {
+          return $q.reject('There are errors in the form.');
+        }
+      }
+    };
+  });
+
 }).call(this);
 
 (function() {
@@ -360,15 +390,24 @@ angular.module("templates/sportily/registration/form.contact.html", []).run(["$t
 
 angular.module("templates/sportily/registration/form.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/sportily/registration/form.html",
-    "<form novalidate>\n" +
+    "<form name=\"form\" novalidate>\n" +
     "\n" +
     "    <h1>2015-2016 Registration</h2>\n" +
     "\n" +
-    "    <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
-    "    <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
-    "    <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
+    "    <div class=\"alert alert-danger\" ng-if=\"error\">{{ error }}</div>\n" +
     "\n" +
-    "    <button class=\"btn btn-primary\" ng-click=\"save()\">Register</button>\n" +
+    "    <div ng-if=\"!complete\">\n" +
+    "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
+    "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
+    "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
+    "        <button class=\"btn btn-primary\" ng-click=\"save()\">Register</button>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <div ng-if=\"complete\">\n" +
+    "        <p>Thank you for registering to participate in the 2015-2015 season.\n" +
+    "        We've just sent you a confirmation email containing instructions of how\n" +
+    "        to verify your account to complete the registration process.</p>\n" +
+    "    </div>\n" +
     "\n" +
     "</form>\n" +
     "");

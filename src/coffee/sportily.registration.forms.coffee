@@ -56,3 +56,24 @@ module.directive 'field', ->
         @label = -> $scope.label
         return
     ]
+
+
+module.factory 'Form', ($window, $q) ->
+
+    showErrors: (scope) ->
+        (response) ->
+            $window.scrollTo 0, 0
+            if response.data
+                scope.error = response.data.error_description
+                _.each response.data.validation_messages, (errors, key) ->
+                    _.each errors, (error) ->
+                        scope.form[key].$setValidity error, false
+            else
+                scope.error = response
+
+
+    isValid: (scope) ->
+        if scope.form.$valid
+            $q.when()
+        else
+            $q.reject 'There are errors in the form.'

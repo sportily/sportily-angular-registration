@@ -81,15 +81,24 @@ angular.module("templates/sportily/registration/form.contact.html", []).run(["$t
 
 angular.module("templates/sportily/registration/form.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/sportily/registration/form.html",
-    "<form novalidate>\n" +
+    "<form name=\"form\" novalidate>\n" +
     "\n" +
     "    <h1>2015-2016 Registration</h2>\n" +
     "\n" +
-    "    <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
-    "    <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
-    "    <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
+    "    <div class=\"alert alert-danger\" ng-if=\"error\">{{ error }}</div>\n" +
     "\n" +
-    "    <button class=\"btn btn-primary\" ng-click=\"save()\">Register</button>\n" +
+    "    <div ng-if=\"!complete\">\n" +
+    "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
+    "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
+    "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
+    "        <button class=\"btn btn-primary\" ng-click=\"save()\">Register</button>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <div ng-if=\"complete\">\n" +
+    "        <p>Thank you for registering to participate in the 2015-2015 season.\n" +
+    "        We've just sent you a confirmation email containing instructions of how\n" +
+    "        to verify your account to complete the registration process.</p>\n" +
+    "    </div>\n" +
     "\n" +
     "</form>\n" +
     "");

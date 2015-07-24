@@ -1,12 +1,14 @@
 module = angular.module 'sportily.registration.controller', [
     'sportily.api'
     'sportily.registration.types'
+    'sportily.registration.forms'
 ]
 
 
 module.controller 'SportilyRegistrationCtrl', [
     '$scope'
     '$q'
+    'Form'
     'AgeGroups'
     'Competitions'
     'Members'
@@ -16,13 +18,14 @@ module.controller 'SportilyRegistrationCtrl', [
     'Types'
     'Users'
 
-    ($scope, $q, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) ->
+    ($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) ->
         $scope.user = {}
         $scope.person = {}
         $scope.member = season_id: $scope.seasonId
         $scope.roles = [ type: null ]
         $scope.state = dateOfBirth: null
         $scope.types = Types
+        $scope.complete = false
 
 
         ##
@@ -43,10 +46,13 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Scope function to submit the form.
         ##
         $scope.save = ->
-            saveUser()
-                .then(savePerson)
-                .then(saveMember)
-                .then(saveRoles)
+            Form.isValid($scope)
+                .then saveUser
+                .then savePerson
+                .then saveMember
+                .then saveRoles
+                .then -> $scope.complete = true
+                .catch Form.showErrors($scope)
 
 
         ##

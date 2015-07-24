@@ -8,10 +8,10 @@
 (function() {
   var module;
 
-  module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.types']);
+  module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.types', 'sportily.registration.forms']);
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
+    '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
       var fetchAgeGroups, fetchCompetitions, fetchTeams, saveMember, savePerson, saveRoles, saveUser;
       $scope.user = {};
       $scope.person = {};
@@ -27,6 +27,7 @@
         dateOfBirth: null
       };
       $scope.types = Types;
+      $scope.complete = false;
       $scope.addRole = function() {
         return $scope.roles.push({
           type: null
@@ -38,7 +39,9 @@
         });
       };
       $scope.save = function() {
-        return saveUser().then(savePerson).then(saveMember).then(saveRoles);
+        return Form.isValid($scope).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(function() {
+          return $scope.complete = true;
+        })["catch"](Form.showErrors($scope));
       };
       fetchCompetitions = function() {
         var filter;
@@ -226,6 +229,33 @@
           };
         }
       ]
+    };
+  });
+
+  module.factory('Form', function($window, $q) {
+    return {
+      showErrors: function(scope) {
+        return function(response) {
+          $window.scrollTo(0, 0);
+          if (response.data) {
+            scope.error = response.data.error_description;
+            return _.each(response.data.validation_messages, function(errors, key) {
+              return _.each(errors, function(error) {
+                return scope.form[key].$setValidity(error, false);
+              });
+            });
+          } else {
+            return scope.error = response;
+          }
+        };
+      },
+      isValid: function(scope) {
+        if (scope.form.$valid) {
+          return $q.when();
+        } else {
+          return $q.reject('There are errors in the form.');
+        }
+      }
     };
   });
 
