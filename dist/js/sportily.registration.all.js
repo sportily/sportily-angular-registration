@@ -457,6 +457,15 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        server-error>\n" +
     "    <info>If member has no relevant medical conditions, please indicate 'None'.</info>\n" +
     "</field>\n" +
+    "\n" +
+    "<!-- dbs number -->\n" +
+    "<field name=\"dbs number\" label=\"DBS registration number\">\n" +
+    "    <input type=\"text\" class=\"form-control\"\n" +
+    "        name=\"dbs_number\"\n" +
+    "        ng-model=\"person.dbs_number\"\n" +
+    "        server-error>\n" +
+    "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
+    "</field>\n" +
     "");
 }]);
 

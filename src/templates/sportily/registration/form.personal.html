@@ -40,3 +40,12 @@
         server-error>
     <info>If member has no relevant medical conditions, please indicate 'None'.</info>
 </field>
+
+<!-- dbs number -->
+<field name="dbs number" label="DBS registration number">
+    <input type="text" class="form-control"
+        name="dbs_number"
+        ng-model="person.dbs_number"
+        server-error>
+    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>
+</field>
