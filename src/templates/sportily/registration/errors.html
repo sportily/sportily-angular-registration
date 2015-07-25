@@ -1,5 +1,5 @@
 <p class="help-block error"
-    ng-if="form[name].$touched"
+    ng-if="form[name].$touched || form.$submitted"
     ng-repeat="(key, value) in form[name].$error"
     ng-switch="key">
 

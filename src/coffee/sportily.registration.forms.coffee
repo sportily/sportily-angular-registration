@@ -46,10 +46,11 @@ module.directive 'field', ->
 
     link: (scope, element, attrs, form) ->
         scope.form = form
-        if !scope.label && scope.label != ''
-            scope.displayLabel = scope.name.ucfirst().replace('_', ' ')
-        else
-            scope.displayLabel = scope.label
+        scope.displayLabel = switch scope.label
+            when undefined then scope.name.ucfirst().replace('_', ' ')
+            when 'empty' then ''
+            when 'none' then ''
+            else scope.label
 
     controller: ['$scope', ($scope) ->
         @name = -> $scope.name

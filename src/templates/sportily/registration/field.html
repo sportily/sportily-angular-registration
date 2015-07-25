@@ -1,5 +1,5 @@
-<div class="form-group" ng-class="{ 'has-error': form[name].$invalid && form[name].$touched }">
-    <label for="{{ name }}">{{ displayLabel }}&nbsp;</label>
+<div class="form-group" ng-class="{ 'has-error': form[name].$invalid && (form[name].$touched || form.$submitted) }">
+    <label for="{{ name }}" ng-if="label != 'none'">{{ displayLabel }}&nbsp;</label>
     <ng-transclude></ng-transclude>
     <errors name="{{ name }}"></errors>
 </div>

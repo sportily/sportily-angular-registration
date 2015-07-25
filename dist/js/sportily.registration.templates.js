@@ -3,7 +3,7 @@ angular.module('sportily.registration.templates', ['templates/sportily/registrat
 angular.module("templates/sportily/registration/errors.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/sportily/registration/errors.html",
     "<p class=\"help-block error\"\n" +
-    "    ng-if=\"form[name].$touched\"\n" +
+    "    ng-if=\"form[name].$touched || form.$submitted\"\n" +
     "    ng-repeat=\"(key, value) in form[name].$error\"\n" +
     "    ng-switch=\"key\">\n" +
     "\n" +
@@ -25,8 +25,8 @@ angular.module("templates/sportily/registration/errors.html", []).run(["$templat
 
 angular.module("templates/sportily/registration/field.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/sportily/registration/field.html",
-    "<div class=\"form-group\" ng-class=\"{ 'has-error': form[name].$invalid && form[name].$touched }\">\n" +
-    "    <label for=\"{{ name }}\">{{ displayLabel }}&nbsp;</label>\n" +
+    "<div class=\"form-group\" ng-class=\"{ 'has-error': form[name].$invalid && (form[name].$touched || form.$submitted) }\">\n" +
+    "    <label for=\"{{ name }}\" ng-if=\"label != 'none'\">{{ displayLabel }}&nbsp;</label>\n" +
     "    <ng-transclude></ng-transclude>\n" +
     "    <errors name=\"{{ name }}\"></errors>\n" +
     "</div>\n" +
@@ -91,7 +91,16 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
-    "        <button class=\"btn btn-primary\" ng-click=\"save()\">Register</button>\n" +
+    "\n" +
+    "        <field name=\"agreement\" label=\"none\">\n" +
+    "            <label>\n" +
+    "                <input type=\"checkbox\" ng-model=\"state.agreement\">\n" +
+    "                I agree to abide by BIPHA Rules, Byelaws, Code of Conduct and\n" +
+    "                Child Protection Policy.\n" +
+    "            </label>\n" +
+    "        </field>\n" +
+    "\n" +
+    "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"!state.agreement\">Register</button>\n" +
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"complete\">\n" +
@@ -116,10 +125,9 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "            ng-model=\"person.given_name\"\n" +
     "            placeholder=\"Forename\"\n" +
     "            required\n" +
-    "            autofocus\n" +
     "            server-error>\n" +
     "    </field>\n" +
-    "    <field name=\"family_name\" label=\"\" class=\"form-group\">\n" +
+    "    <field name=\"family_name\" label=\"empty\" class=\"form-group\">\n" +
     "        <input type=\"text\" class=\"form-control\"\n" +
     "            name=\"family_name\"\n" +
     "            ng-model=\"person.family_name\"\n" +
@@ -205,6 +213,6 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
 
 angular.module("templates/sportily/registration/info.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/sportily/registration/info.html",
-    "<p class=\"help-block\" ng-hide=\"form[name].$invalid && form[name].$touched\" ng-transclude></p>\n" +
+    "<p class=\"help-block\" ng-hide=\"form[name].$invalid && (form[name].$touched || form.$submitted)\" ng-transclude></p>\n" +
     "");
 }]);

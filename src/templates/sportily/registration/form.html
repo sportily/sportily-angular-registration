@@ -8,7 +8,16 @@
         <div ng-include="'templates/sportily/registration/form.personal.html'"></div>
         <div ng-include="'templates/sportily/registration/form.roles.html'"></div>
         <div ng-include="'templates/sportily/registration/form.contact.html'"></div>
-        <button class="btn btn-primary" ng-click="save()">Register</button>
+
+        <field name="agreement" label="none">
+            <label>
+                <input type="checkbox" ng-model="state.agreement">
+                I agree to abide by BIPHA Rules, Byelaws, Code of Conduct and
+                Child Protection Policy.
+            </label>
+        </field>
+
+        <button class="btn btn-primary" ng-click="save()" ng-disabled="!state.agreement">Register</button>
     </div>
 
     <div ng-if="complete">

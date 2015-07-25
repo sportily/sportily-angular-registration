@@ -28,6 +28,9 @@
       };
       $scope.types = Types;
       $scope.complete = false;
+      $scope.state = {
+        agreement: false
+      };
       $scope.addRole = function() {
         return $scope.roles.push({
           type: null
@@ -213,11 +216,18 @@
       },
       link: function(scope, element, attrs, form) {
         scope.form = form;
-        if (!scope.label && scope.label !== '') {
-          return scope.displayLabel = scope.name.ucfirst().replace('_', ' ');
-        } else {
-          return scope.displayLabel = scope.label;
-        }
+        return scope.displayLabel = (function() {
+          switch (scope.label) {
+            case void 0:
+              return scope.name.ucfirst().replace('_', ' ');
+            case 'empty':
+              return '';
+            case 'none':
+              return '';
+            default:
+              return scope.label;
+          }
+        })();
       },
       controller: [
         '$scope', function($scope) {

@@ -26,6 +26,7 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.state = dateOfBirth: null
         $scope.types = Types
         $scope.complete = false
+        $scope.state = agreement: false
 
 
         ##
