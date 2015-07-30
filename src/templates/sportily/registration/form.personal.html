@@ -1,7 +1,7 @@
-<h3>Personal Details</h3>
+<!--<h3>Personal Details</h3>-->
 
 <!-- name -->
-<div class="form-group form-group-name">
+<!--<div class="form-group form-group-name">
     <field name="given_name" label="Name" class="form-group">
         <input type="text" class="form-control"
             name="given_name"
@@ -18,7 +18,22 @@
             required
             server-error>
     </field>
-</div>
+</div>-->
+<field name="given_name" label="Forename" class="form-group">
+    <input type="text" class="form-control"
+        name="given_name"
+        ng-model="person.given_name"
+        required
+        server-error>
+</field>
+<field name="family_name" label="Surname" class="form-group">
+    <input type="text" class="form-control"
+        name="family_name"
+        ng-model="person.family_name"
+        required
+        server-error>
+</field>
+
 
 <!-- date of birth -->
 <field name="date_of_birth">

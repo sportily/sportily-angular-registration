@@ -83,8 +83,6 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
   $templateCache.put("templates/sportily/registration/form.html",
     "<form name=\"form\" novalidate>\n" +
     "\n" +
-    "    <h1>2015-2016 Registration</h2>\n" +
-    "\n" +
     "    <div class=\"alert alert-danger\" ng-if=\"error\">{{ error }}</div>\n" +
     "\n" +
     "    <div ng-if=\"!complete\">\n" +
@@ -115,10 +113,10 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
 
 angular.module("templates/sportily/registration/form.personal.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/sportily/registration/form.personal.html",
-    "<h3>Personal Details</h3>\n" +
+    "<!--<h3>Personal Details</h3>-->\n" +
     "\n" +
     "<!-- name -->\n" +
-    "<div class=\"form-group form-group-name\">\n" +
+    "<!--<div class=\"form-group form-group-name\">\n" +
     "    <field name=\"given_name\" label=\"Name\" class=\"form-group\">\n" +
     "        <input type=\"text\" class=\"form-control\"\n" +
     "            name=\"given_name\"\n" +
@@ -135,7 +133,22 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "            required\n" +
     "            server-error>\n" +
     "    </field>\n" +
-    "</div>\n" +
+    "</div>-->\n" +
+    "<field name=\"given_name\" label=\"Forename\" class=\"form-group\">\n" +
+    "    <input type=\"text\" class=\"form-control\"\n" +
+    "        name=\"given_name\"\n" +
+    "        ng-model=\"person.given_name\"\n" +
+    "        required\n" +
+    "        server-error>\n" +
+    "</field>\n" +
+    "<field name=\"family_name\" label=\"Surname\" class=\"form-group\">\n" +
+    "    <input type=\"text\" class=\"form-control\"\n" +
+    "        name=\"family_name\"\n" +
+    "        ng-model=\"person.family_name\"\n" +
+    "        required\n" +
+    "        server-error>\n" +
+    "</field>\n" +
+    "\n" +
     "\n" +
     "<!-- date of birth -->\n" +
     "<field name=\"date_of_birth\">\n" +
