@@ -133,7 +133,7 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "\n" +
     "<!-- date of birth -->\n" +
     "<field name=\"date_of_birth\">\n" +
-    "    <input type=\"date\" class=\"form-control\"\n" +
+    "    <input type=\"text\" class=\"form-control\"\n" +
     "        name=\"date_of_birth\"\n" +
     "        ng-model=\"state.dateOfBirth\"\n" +
     "        placeholder=\"dd/mm/yyyy\"\n" +
