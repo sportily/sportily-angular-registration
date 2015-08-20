@@ -23,10 +23,12 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.person = {}
         $scope.member = season_id: $scope.seasonId
         $scope.roles = [ type: null ]
-        $scope.state = dateOfBirth: null
         $scope.types = Types
         $scope.complete = false
-        $scope.state = agreement: false
+
+        $scope.state =
+            agreement: false
+            dateOfBirth: null
 
 
         ##
@@ -100,11 +102,6 @@ module.controller 'SportilyRegistrationCtrl', [
         ##
         savePerson = (user) ->
             $scope.person.user_id = user.id
-
-            if $scope.state.dateOfBirth
-                $scope.person.date_of_birth =
-                    moment($scope.state.dateOfBirth).format 'YYYY-MM-DD'
-
             People.post $scope.person
 
 
@@ -131,4 +128,18 @@ module.controller 'SportilyRegistrationCtrl', [
         fetchCompetitions()
         fetchAgeGroups()
         fetchTeams()
+
+
+        # watch the date of birth for changes, and update the person model
+        # ensuring that we support dates as Date objects (as provided by date
+        # inputs) and strings (as provided by fallback text inputs).
+        $scope.$watch 'state.dateOfBirth', (value) ->
+            input = 'DD/MM/YYYY'
+            output = 'YYYY-MM-DD'
+            dob = switch
+                when value instanceof Date then moment(value)
+                else moment(value, input, true)
+
+            $scope.person.date_of_birth = dob.format output if dob.isValid()
+            $scope.form['date_of_birth'].$setValidity 'date', dob.isValid()
 ]

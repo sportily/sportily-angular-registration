@@ -23,13 +23,11 @@
           type: null
         }
       ];
-      $scope.state = {
-        dateOfBirth: null
-      };
       $scope.types = Types;
       $scope.complete = false;
       $scope.state = {
-        agreement: false
+        agreement: false,
+        dateOfBirth: null
       };
       $scope.addRole = function() {
         return $scope.roles.push({
@@ -85,9 +83,6 @@
       };
       savePerson = function(user) {
         $scope.person.user_id = user.id;
-        if ($scope.state.dateOfBirth) {
-          $scope.person.date_of_birth = moment($scope.state.dateOfBirth).format('YYYY-MM-DD');
-        }
         return People.post($scope.person);
       };
       saveMember = function(person) {
@@ -102,7 +97,24 @@
       };
       fetchCompetitions();
       fetchAgeGroups();
-      return fetchTeams();
+      fetchTeams();
+      return $scope.$watch('state.dateOfBirth', function(value) {
+        var dob, input, output;
+        input = 'DD/MM/YYYY';
+        output = 'YYYY-MM-DD';
+        dob = (function() {
+          switch (false) {
+            case !(value instanceof Date):
+              return moment(value);
+            default:
+              return moment(value, input, true);
+          }
+        })();
+        if (dob.isValid()) {
+          $scope.person.date_of_birth = dob.format(output);
+        }
+        return $scope.form['date_of_birth'].$setValidity('date', dob.isValid());
+      });
     }
   ]);
 

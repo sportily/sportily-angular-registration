@@ -8,6 +8,7 @@ angular.module("templates/sportily/registration/errors.html", []).run(["$templat
     "    ng-switch=\"key\">\n" +
     "\n" +
     "    <!-- client-side -->\n" +
+    "    <span ng-switch-when=\"date\">Dates must be in the dd/mm/yyyy format</span>\n" +
     "    <span ng-switch-when=\"email\">Invalid email address</span>\n" +
     "    <span ng-switch-when=\"required\">Required field</span>\n" +
     "\n" +
@@ -113,27 +114,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
 
 angular.module("templates/sportily/registration/form.personal.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/sportily/registration/form.personal.html",
-    "<!--<h3>Personal Details</h3>-->\n" +
-    "\n" +
     "<!-- name -->\n" +
-    "<!--<div class=\"form-group form-group-name\">\n" +
-    "    <field name=\"given_name\" label=\"Name\" class=\"form-group\">\n" +
-    "        <input type=\"text\" class=\"form-control\"\n" +
-    "            name=\"given_name\"\n" +
-    "            ng-model=\"person.given_name\"\n" +
-    "            placeholder=\"Forename\"\n" +
-    "            required\n" +
-    "            server-error>\n" +
-    "    </field>\n" +
-    "    <field name=\"family_name\" label=\"empty\" class=\"form-group\">\n" +
-    "        <input type=\"text\" class=\"form-control\"\n" +
-    "            name=\"family_name\"\n" +
-    "            ng-model=\"person.family_name\"\n" +
-    "            placeholder=\"Surname\"\n" +
-    "            required\n" +
-    "            server-error>\n" +
-    "    </field>\n" +
-    "</div>-->\n" +
     "<field name=\"given_name\" label=\"Forename\" class=\"form-group\">\n" +
     "    <input type=\"text\" class=\"form-control\"\n" +
     "        name=\"given_name\"\n" +
@@ -155,6 +136,7 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "    <input type=\"date\" class=\"form-control\"\n" +
     "        name=\"date_of_birth\"\n" +
     "        ng-model=\"state.dateOfBirth\"\n" +
+    "        placeholder=\"dd/mm/yyyy\"\n" +
     "        required\n" +
     "        server-error>\n" +
     "</field>\n" +
@@ -165,7 +147,6 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        name=\"medical_conditions\"\n" +
     "        ng-model=\"person.medical_conditions\"\n" +
     "        placeholder=\"e.g. Asthma\"\n" +
-    "        required\n" +
     "        server-error>\n" +
     "    <info>If member has no relevant medical conditions, please indicate 'None'.</info>\n" +
     "</field>\n" +
