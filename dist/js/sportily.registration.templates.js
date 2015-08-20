@@ -219,7 +219,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "</div>\n" +
     "\n" +
     "<div class=\"form-group\">\n" +
-    "    <button class=\"btn btn-default\" ng-click=\"addRole()\">Add more roles&hellip;</button>\n" +
+    "    <a ng-click=\"addRole()\">Add more roles&hellip;</a>\n" +
     "</div>\n" +
     "");
 }]);
