@@ -166,6 +166,8 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
   $templateCache.put("templates/sportily/registration/form.roles.html",
     "<h3>League Roles</h3>\n" +
     "\n" +
+    "<pre>{{ roles }}</pre>\n" +
+    "\n" +
     "<div class=\"form-inline form-group\" ng-repeat=\"role in roles\">\n" +
     "\n" +
     "    <label>Role #{{ $index + 1 }}:</label>\n" +
@@ -180,7 +182,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\" ng-show=\"role.competition_id\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"key as type.name for (key, type) in types\"\n" +
+    "            ng-options=\"type.key as type.label for type in typeOptions\"\n" +
     "            ng-model=\"role.type\">\n" +
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +

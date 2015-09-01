@@ -23,8 +23,15 @@
           type: null
         }
       ];
-      $scope.types = Types;
       $scope.complete = false;
+      $scope.types = Types;
+      $scope.typeOptions = _(Types).map(function(value, key) {
+        return {
+          key: key,
+          label: value.name,
+          index: value.index
+        };
+      }).sortBy('index').value();
       $scope.state = {
         agreement: false,
         dateOfBirth: null
@@ -290,38 +297,48 @@
 
   module.constant('Types', {
     player: {
+      index: 1,
       name: 'Player',
       requiresTeam: true
     },
+    coach: {
+      index: 2,
+      name: 'Coach',
+      requiresTeam: true
+    },
+    manager: {
+      index: 3,
+      name: 'Manager',
+      requiresTeam: true
+    },
+    official: {
+      index: 4,
+      name: 'Non-Bench Official'
+    },
+    committee: {
+      index: 5,
+      name: 'Regional Committee'
+    },
+    referee: {
+      index: 6,
+      name: 'Referee'
+    },
+    timekeeper: {
+      index: 7,
+      name: 'Timekeeper'
+    },
     player_training: {
+      index: 8,
       name: 'Player (Training)',
       requiresTeam: true
     },
     player_recreational: {
+      index: 9,
       name: 'Player (Recreational)',
       requiresTeam: true
     },
-    manager: {
-      name: 'Manager',
-      requiresTeam: true
-    },
-    coach: {
-      name: 'Coach',
-      requiresTeam: true
-    },
-    referee: {
-      name: 'Referee'
-    },
-    timekeeper: {
-      name: 'Timekeeper'
-    },
-    official: {
-      name: 'Non-Bench Official'
-    },
-    committee: {
-      name: 'Regional Committee'
-    },
     parent: {
+      index: 10,
       name: 'Parent',
       requiresTeam: true
     }

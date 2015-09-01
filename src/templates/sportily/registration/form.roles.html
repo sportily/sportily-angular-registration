@@ -1,5 +1,7 @@
 <h3>League Roles</h3>
 
+<pre>{{ roles }}</pre>
+
 <div class="form-inline form-group" ng-repeat="role in roles">
 
     <label>Role #{{ $index + 1 }}:</label>
@@ -14,7 +16,7 @@
 
     <div class="form-group" ng-show="role.competition_id">
         <select class="form-control"
-            ng-options="key as type.name for (key, type) in types"
+            ng-options="type.key as type.label for type in typeOptions"
             ng-model="role.type">
             <option value="">Role&hellip;</option>
         </select>

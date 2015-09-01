@@ -23,8 +23,13 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.person = {}
         $scope.member = season_id: $scope.seasonId
         $scope.roles = [ type: null ]
-        $scope.types = Types
         $scope.complete = false
+
+        $scope.types = Types
+        $scope.typeOptions = _(Types)
+            .map (value, key) -> key: key, label: value.name, index: value.index
+            .sortBy 'index'
+            .value()
 
         $scope.state =
             agreement: false
