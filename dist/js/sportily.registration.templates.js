@@ -166,8 +166,6 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
   $templateCache.put("templates/sportily/registration/form.roles.html",
     "<h3>League Roles</h3>\n" +
     "\n" +
-    "<pre>{{ roles }}</pre>\n" +
-    "\n" +
     "<div class=\"form-inline form-group\" ng-repeat=\"role in roles\">\n" +
     "\n" +
     "    <label>Role #{{ $index + 1 }}:</label>\n" +
