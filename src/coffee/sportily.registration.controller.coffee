@@ -4,6 +4,7 @@ module = angular.module 'sportily.registration.controller', [
     'sportily.registration.forms'
 ]
 
+NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.'
 
 module.controller 'SportilyRegistrationCtrl', [
     '$scope'
@@ -51,10 +52,21 @@ module.controller 'SportilyRegistrationCtrl', [
 
 
         ##
+        ## Verify that at least one of the roles is valid.
+        ##
+        roleIsValid = (role) ->
+            role.competition_id && role.type
+        verifyRoles = ->
+            valid =  _.some $scope.roles, roleIsValid
+            throw NO_VALID_ROLES_MESSAGE unless valid
+
+
+        ##
         ## Scope function to submit the form.
         ##
         $scope.save = ->
             Form.isValid($scope)
+                .then verifyRoles
                 .then saveUser
                 .then savePerson
                 .then saveMember

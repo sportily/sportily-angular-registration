@@ -6,13 +6,15 @@
 }).call(this);
 
 (function() {
-  var module;
+  var NO_VALID_ROLES_MESSAGE, module;
 
   module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.types', 'sportily.registration.forms']);
 
+  NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
+
   module.controller('SportilyRegistrationCtrl', [
     '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
-      var fetchAgeGroups, fetchCompetitions, fetchTeams, saveMember, savePerson, saveRoles, saveUser;
+      var fetchAgeGroups, fetchCompetitions, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {};
       $scope.member = {
@@ -46,8 +48,18 @@
           return role !== toBeRemoved;
         });
       };
+      roleIsValid = function(role) {
+        return role.competition_id && role.type;
+      };
+      verifyRoles = function() {
+        var valid;
+        valid = _.some($scope.roles, roleIsValid);
+        if (!valid) {
+          throw NO_VALID_ROLES_MESSAGE;
+        }
+      };
       $scope.save = function() {
-        return Form.isValid($scope).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(function() {
+        return Form.isValid($scope).then(verifyRoles).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(function() {
           return $scope.complete = true;
         })["catch"](Form.showErrors($scope));
       };
