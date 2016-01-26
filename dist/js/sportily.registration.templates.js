@@ -94,8 +94,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <field name=\"agreement\" label=\"none\">\n" +
     "            <label>\n" +
     "                <input type=\"checkbox\" ng-model=\"state.agreement\">\n" +
-    "                I agree to abide by BIPHA Rules, Byelaws, Code of Conduct and\n" +
-    "                Child Protection Policy.\n" +
+    "                {{ agreementMessage }}\n" +
     "            </label>\n" +
     "        </field>\n" +
     "\n" +
@@ -103,9 +102,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"complete\">\n" +
-    "        <p>Thank you for registering to participate in the 2015-2015 season.\n" +
-    "        We've just sent you a confirmation email containing instructions of how\n" +
-    "        to verify your account to complete the registration process.</p>\n" +
+    "        <p>{{ confirmationMessage }}</p>\n" +
     "    </div>\n" +
     "\n" +
     "</form>\n" +

@@ -8,3 +8,5 @@ module.directive 'sportilyRegistration', ->
     scope:
         registrationId: '@registration'
         seasonId: '@season'
+        agreementMessage: '@'
+        confirmationMessage: '@'

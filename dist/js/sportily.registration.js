@@ -151,7 +151,9 @@
       templateUrl: 'templates/sportily/registration/form.html',
       scope: {
         registrationId: '@registration',
-        seasonId: '@season'
+        seasonId: '@season',
+        agreementMessage: '@',
+        confirmationMessage: '@'
       }
     };
   });

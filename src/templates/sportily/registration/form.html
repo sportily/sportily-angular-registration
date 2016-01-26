@@ -10,8 +10,7 @@
         <field name="agreement" label="none">
             <label>
                 <input type="checkbox" ng-model="state.agreement">
-                I agree to abide by BIPHA Rules, Byelaws, Code of Conduct and
-                Child Protection Policy.
+                {{ agreementMessage }}
             </label>
         </field>
 
@@ -19,9 +18,7 @@
     </div>
 
     <div ng-if="complete">
-        <p>Thank you for registering to participate in the 2015-2015 season.
-        We've just sent you a confirmation email containing instructions of how
-        to verify your account to complete the registration process.</p>
+        <p>{{ confirmationMessage }}</p>
     </div>
 
 </form>
