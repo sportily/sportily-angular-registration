@@ -141,6 +141,19 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        server-error>\n" +
     "</field>\n" +
     "\n" +
+    "<!-- gender -->\n" +
+    "<field name=\"gender\">\n" +
+    "    <select class=\"form-control\"\n" +
+    "        name=\"gender\"\n" +
+    "        ng-model=\"person.gender\"\n" +
+    "        required\n" +
+    "        server-error>\n" +
+    "        <option value=\"\"></option>\n" +
+    "        <option value=\"female\">Female</option>\n" +
+    "        <option value=\"male\">Male</option>\n" +
+    "    </select>\n" +
+    "</field>\n" +
+    "\n" +
     "<!-- medical conditions -->\n" +
     "<field name=\"medical_conditions\">\n" +
     "    <input type=\"text\" class=\"form-control\"\n" +
