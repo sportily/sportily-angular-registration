@@ -25,6 +25,19 @@
         server-error>
 </field>
 
+<!-- gender -->
+<field name="gender">
+    <select class="form-control"
+        name="gender"
+        ng-model="person.gender"
+        required
+        server-error>
+        <option value=""></option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+    </select>
+</field>
+
 <!-- medical conditions -->
 <field name="medical_conditions">
     <input type="text" class="form-control"
