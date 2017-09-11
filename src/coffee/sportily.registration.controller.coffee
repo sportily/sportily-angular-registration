@@ -71,7 +71,9 @@ module.controller 'SportilyRegistrationCtrl', [
                 .then savePerson
                 .then saveMember
                 .then saveRoles
-                .then -> $scope.complete = true
+                .then ->
+                  $scope.complete = true
+                  $scope.error = null
                 .catch Form.showErrors($scope)
 
 
@@ -158,5 +160,5 @@ module.controller 'SportilyRegistrationCtrl', [
                 else moment(value, input, true)
 
             $scope.person.date_of_birth = dob.format output if dob.isValid()
-            $scope.form['date_of_birth'].$setValidity 'date', dob.isValid()
+            $scope.form['date_of_birth'].$setValidity 'date', dob.isValid() if $scope.form['date_of_birth']
 ]

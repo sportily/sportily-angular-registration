@@ -60,7 +60,8 @@
       };
       $scope.save = function() {
         return Form.isValid($scope).then(verifyRoles).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(function() {
-          return $scope.complete = true;
+          $scope.complete = true;
+          return $scope.error = null;
         })["catch"](Form.showErrors($scope));
       };
       fetchCompetitions = function() {
@@ -132,7 +133,9 @@
         if (dob.isValid()) {
           $scope.person.date_of_birth = dob.format(output);
         }
-        return $scope.form['date_of_birth'].$setValidity('date', dob.isValid());
+        if ($scope.form['date_of_birth']) {
+          return $scope.form['date_of_birth'].$setValidity('date', dob.isValid());
+        }
       });
     }
   ]);
