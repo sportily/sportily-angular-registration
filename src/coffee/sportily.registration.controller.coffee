@@ -55,7 +55,8 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Verify that at least one of the roles is valid.
         ##
         roleIsValid = (role) ->
-            role.competition_id && role.type
+            rule = Types[role.type]
+            role.competition_id && role.type && (!rule.requiresTeam || role.team_id)
         verifyRoles = ->
             valid =  _.some $scope.roles, roleIsValid
             throw NO_VALID_ROLES_MESSAGE unless valid

@@ -49,7 +49,9 @@
         });
       };
       roleIsValid = function(role) {
-        return role.competition_id && role.type;
+        var rule;
+        rule = Types[role.type];
+        return role.competition_id && role.type && (!rule.requiresTeam || role.team_id);
       };
       verifyRoles = function() {
         var valid;
@@ -458,7 +460,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "\n" +
     "        <field name=\"agreement\" label=\"none\">\n" +
     "            <label>\n" +
-    "                <input type=\"checkbox\" ng-model=\"state.agreement\">\n" +
+    "                <input type=\"checkbox\" ng-model=\"state.agreement\" required>\n" +
     "                {{ agreementMessage }}\n" +
     "            </label>\n" +
     "        </field>\n" +
@@ -822,7 +824,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"team.id as team.name + ' (' + ageGroups.lookup[team.age_group_id].name + ')' for team in teams|forCompetition:role.competition_id\"\n" +
-    "            ng-model=\"role.team_id\">\n" +
+    "            ng-model=\"role.team_id\" ng-required=\"types[role.type].requiresTeam\">\n" +
     "            <option value=\"\">Team&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +

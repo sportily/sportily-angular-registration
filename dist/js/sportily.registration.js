@@ -49,7 +49,9 @@
         });
       };
       roleIsValid = function(role) {
-        return role.competition_id && role.type;
+        var rule;
+        rule = Types[role.type];
+        return role.competition_id && role.type && (!rule.requiresTeam || role.team_id);
       };
       verifyRoles = function() {
         var valid;

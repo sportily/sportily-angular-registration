@@ -24,7 +24,7 @@
         <span>for</span>
         <select class="form-control"
             ng-options="team.id as team.name + ' (' + ageGroups.lookup[team.age_group_id].name + ')' for team in teams|forCompetition:role.competition_id"
-            ng-model="role.team_id">
+            ng-model="role.team_id" ng-required="types[role.type].requiresTeam">
             <option value="">Team&hellip;</option>
         </select>
     </div>
