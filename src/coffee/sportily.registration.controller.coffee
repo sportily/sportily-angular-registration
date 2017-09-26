@@ -34,7 +34,7 @@ module.controller 'SportilyRegistrationCtrl', [
 
         $scope.state =
             agreement: false
-            dateOfBirth: null
+            dateOfBirth: ''
 
 
         ##
@@ -72,11 +72,19 @@ module.controller 'SportilyRegistrationCtrl', [
                 .then savePerson
                 .then saveMember
                 .then saveRoles
-                .then ->
+                .then fetchMember
+                .then (member) ->
+                  $scope.member = member
                   $scope.complete = true
                   $scope.error = null
                 .catch Form.showErrors($scope)
 
+
+        ##
+        ## Fetch a list of all the age groups for the current season.
+        ##
+        fetchMember = ->
+            Members.one($scope.member_id).get()
 
         ##
         ## Fetch a list of all the organisations for the current registration
@@ -139,9 +147,12 @@ module.controller 'SportilyRegistrationCtrl', [
         ## member.
         ##
         saveRoles = (member) ->
+            $scope.member_id = member.id
+            rolePromises = []
             $scope.roles.forEach (role) ->
                 role.member_id = member.id
-                Roles.post role
+                rolePromises.push(Roles.post(role))
+            return $q.all(rolePromises);
 
 
         # initialise the scope with necessary data.
