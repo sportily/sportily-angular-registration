@@ -29,7 +29,7 @@ module.directive('paymentButton', ($q, StripeService, Organisations, PaymentServ
     arePaymentsPossible = ($scope) ->
         nationalId = null
         $scope.paymentsConfigured = false;
-        if ($scope.member && member.financial_summary)
+        if ($scope.member && $scope.member.financial_summary)
             nationalId = getNationalId($scope.member);
             if (nationalId)
                 Organisations.one(nationalId).get().then((nationalOrganisation) ->
