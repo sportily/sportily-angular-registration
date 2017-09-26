@@ -194,7 +194,7 @@
       var nationalId;
       nationalId = null;
       $scope.paymentsConfigured = false;
-      if ($scope.member && member.financial_summary) {
+      if ($scope.member && $scope.member.financial_summary) {
         nationalId = getNationalId($scope.member);
         if (nationalId) {
           return Organisations.one(nationalId).get().then(function(nationalOrganisation) {
