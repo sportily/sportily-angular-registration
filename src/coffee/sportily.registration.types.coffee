@@ -44,7 +44,12 @@ module.constant 'Types',
         name: 'Player (Recreational)'
         requiresTeam: true
 
-    parent:
+    player_cross_registration:
         index: 10
+        name: 'Player (Cross Registration)'
+        requiresTeam: true
+
+    parent:
+        index: 11
         name: 'Parent'
         requiresTeam: true

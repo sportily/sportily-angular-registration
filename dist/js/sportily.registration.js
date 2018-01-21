@@ -14,7 +14,7 @@
 
   module.controller('SportilyRegistrationCtrl', [
     '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
-      var fetchAgeGroups, fetchCompetitions, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
+      var fetchAgeGroups, fetchCompetitions, fetchMember, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {};
       $scope.member = {
@@ -61,10 +61,14 @@
         }
       };
       $scope.save = function() {
-        return Form.isValid($scope).then(verifyRoles).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(function() {
+        return Form.isValid($scope).then(verifyRoles).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(fetchMember).then(function(member) {
+          $scope.member = member;
           $scope.complete = true;
           return $scope.error = null;
         })["catch"](Form.showErrors($scope));
+      };
+      fetchMember = function() {
+        return Members.one($scope.member_id).get();
       };
       fetchCompetitions = function() {
         var filter;
@@ -112,10 +116,14 @@
         return Members.post($scope.member);
       };
       saveRoles = function(member) {
-        return $scope.roles.forEach(function(role) {
+        var rolePromises;
+        $scope.member_id = member.id;
+        rolePromises = [];
+        $scope.roles.forEach(function(role) {
           role.member_id = member.id;
-          return Roles.post(role);
+          return rolePromises.push(Roles.post(role));
         });
+        return $q.all(rolePromises);
       };
       fetchCompetitions();
       fetchAgeGroups();
@@ -356,8 +364,13 @@
       name: 'Player (Recreational)',
       requiresTeam: true
     },
-    parent: {
+    player_cross_registration: {
       index: 10,
+      name: 'Player (Cross Registration)',
+      requiresTeam: true
+    },
+    parent: {
+      index: 11,
       name: 'Parent',
       requiresTeam: true
     }
