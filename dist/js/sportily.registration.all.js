@@ -1,7 +1,7 @@
 (function() {
   var module;
 
-  module = angular.module('sportily.registration', ['sportily.registration.controller', 'sportily.registration.directive', 'sportily.registration.filters', 'sportily.registration.templates', 'sportily.registration.forms']);
+  module = angular.module('sportily.registration', ['sportily.registration.controller', 'sportily.registration.directive', 'sportily.registration.services', 'sportily.registration.filters', 'sportily.registration.templates', 'sportily.registration.forms']);
 
 }).call(this);
 
@@ -36,7 +36,7 @@
       }).sortBy('index').value();
       $scope.state = {
         agreement: false,
-        dateOfBirth: null
+        dateOfBirth: ''
       };
       $scope.addRole = function() {
         return $scope.roles.push({
@@ -171,6 +171,76 @@
     };
   });
 
+  module.directive('paymentButton', function($q, StripeService, Organisations, PaymentService, Members) {
+    var arePaymentsPossible, getNationalId, getTotal;
+    getTotal = function(member) {
+      if (member.financial_summary) {
+        return member.financial_summary.owed.total;
+      }
+    };
+    getNationalId = function(member) {
+      var nationalId, orgs;
+      orgs = null;
+      nationalId = null;
+      orgs = member.financial_summary.owed.organisations;
+      Object.getOwnPropertyNames(orgs).forEach(function(prop) {
+        if (orgs[prop].type === 'national') {
+          return nationalId = prop;
+        }
+      });
+      return nationalId;
+    };
+    arePaymentsPossible = function($scope) {
+      var nationalId;
+      nationalId = null;
+      $scope.paymentsConfigured = false;
+      if ($scope.member && $scope.member.financial_summary) {
+        nationalId = getNationalId($scope.member);
+        if (nationalId) {
+          return Organisations.one(nationalId).get().then(function(nationalOrganisation) {
+            $scope.nationalOrganisation = nationalOrganisation;
+            return $scope.paymentsConfigured = nationalOrganisation.stripe_user_id;
+          });
+        }
+      }
+    };
+    return {
+      restrict: 'E',
+      scope: {
+        member: '=',
+        email: '=',
+        message: '='
+      },
+      template: '<button type="button" ng-if="paymentsConfigured && total > 0" ng-click="pay()" class="btn btn-primary">Pay Now</button>',
+      controller: function($scope) {
+        arePaymentsPossible($scope);
+        $scope.total = getTotal($scope.member);
+        return $scope.pay = function() {
+          return StripeService.getOneTimeToken($scope.total, $scope.email).then(function(stripeToken) {
+            return PaymentService.take(stripeToken, $scope.member);
+          }).then(function(payment) {
+            if (payment.status === 'complete') {
+              return Members.one($scope.member.id).get().then(function(member) {
+                $scope.member = member;
+                return $scope.total = getTotal($scope.member);
+              }).then(function() {
+                return $scope.message = {
+                  type: 'success',
+                  message: 'Payment completed successfully.'
+                };
+              });
+            }
+          })["catch"](function(error) {
+            return $scope.message = {
+              type: 'danger',
+              message: 'Payment unsuccessful.'
+            };
+          });
+        };
+      }
+    };
+  });
+
 }).call(this);
 
 (function() {
@@ -195,6 +265,16 @@
           id: id
         });
       });
+    };
+  });
+
+  module.filter('money', function(currencyFilter) {
+    return function(input) {
+      if (input) {
+        return currencyFilter(input / 100, '£');
+      } else {
+        return '–';
+      }
     };
   });
 
@@ -311,6 +391,112 @@
         } else {
           return $q.reject('There are errors in the form.');
         }
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var module;
+
+  module = angular.module('sportily.registration.services', []);
+
+  module.factory('StripeService', function($q, StripePublishableKey) {
+    return {
+      getOneTimeToken: function(amount, email) {
+        var deferred, handler, options;
+        deferred = $q.defer();
+        handler = StripeCheckout.configure({
+          key: StripePublishableKey,
+          name: "Pay League Fees",
+          allowRememberMe: false,
+          email: email,
+          token: function(token, args) {
+            return deferred.resolve(token);
+          },
+          closed: function() {
+            return deferred.reject("form.closed");
+          }
+        });
+        options = {
+          description: "Sportily League Fees",
+          zipCode: true,
+          currency: "gbp",
+          amount: amount
+        };
+        handler.open(options);
+        return deferred.promise;
+      }
+    };
+  });
+
+  module.factory('PaymentService', function($q, Transactions, Payments) {
+    var getNational, getRegionals;
+    getNational = function(member) {
+      var national, orgs;
+      orgs = null;
+      national = [];
+      orgs = member.financial_summary.owed.organisations;
+      Object.getOwnPropertyNames(orgs).forEach(function(prop) {
+        if (orgs[prop].type === 'national') {
+          orgs[prop].id = prop;
+          return national = orgs[prop];
+        }
+      });
+      return national;
+    };
+    getRegionals = function(member) {
+      var orgs, regions;
+      orgs = null;
+      regions = [];
+      orgs = member.financial_summary.owed.organisations;
+      Object.getOwnPropertyNames(orgs).forEach(function(prop) {
+        if (orgs[prop].type === 'regional') {
+          orgs[prop].id = prop;
+          return regions.push(orgs[prop]);
+        }
+      });
+      return regions;
+    };
+    return {
+      take: function(stripeToken, member, amount) {
+        var national, nationalPromise, promises, regions;
+        national = getNational(member);
+        regions = getRegionals(member);
+        promises = regions.map(function(region) {
+          return Transactions.post({
+            type: 'standard',
+            amount: region.total,
+            source_id: member.id,
+            target_id: null,
+            status: 'pending',
+            organisation_id: region.id,
+            paid_to_organisation_id: national.id,
+            method: "online"
+          });
+        });
+        nationalPromise = Transactions.post({
+          type: 'standard',
+          amount: national.total,
+          source_id: member.id,
+          target_id: null,
+          status: 'pending',
+          organisation_id: national.id,
+          paid_to_organisation_id: null,
+          method: "online"
+        });
+        promises.push(nationalPromise);
+        return $q.all(promises).then(function(transactions) {
+          return Payments.post({
+            amount: member.financial_summary.owed.total,
+            organisation_id: national.id,
+            stripe_payment_token: stripeToken.id,
+            transaction_ids: transactions.map(function(transaction) {
+              return transaction.id;
+            })
+          });
+        });
       }
     };
   });
@@ -483,6 +669,9 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "\n" +
     "    <div ng-if=\"complete\">\n" +
     "        <p>{{ confirmationMessage }}</p>\n" +
+    "        <p ng-if=\"message\" class=\"alert alert-{{message.type}}\">{{message.message}}</p>\n" +
+    "        <p ng-if=\"member.financial_summary.owed.total\"> Your member fees are: {{ member.financial_summary.owed.total | money }}\n" +
+    "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\"></payment-button></p>\n" +
     "    </div>\n" +
     "\n" +
     "</form>\n" +

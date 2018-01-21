@@ -34,7 +34,7 @@ module.controller 'SportilyRegistrationCtrl', [
 
         $scope.state =
             agreement: false
-            dateOfBirth: null
+            dateOfBirth: ''
 
 
         ##
