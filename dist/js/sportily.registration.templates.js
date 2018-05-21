@@ -180,7 +180,7 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        ng-true-value=\"1\"\n" +
     "        ng-true-value=\"0\"\n" +
     "        server-error>\n" +
-    "    <info>Do you consent to receive marketing materials from your league?</info>\n" +
+    "    <info>Do you consent to receive marketing materials or newsletters from your league?</info>\n" +
     "</field>\n" +
     "\n" +
     "<!-- passport nationality -->\n" +
