@@ -57,6 +57,16 @@
     <info>A valid DBS registration is required for all officials aged 16 year or older.</info>
 </field>
 
+<field name="Marketing Opt In">
+    <input type="checkbox"
+        name="marketing_opt_in"
+        ng-model="person.marketing_opt_in"
+        ng-true-value="1"
+        ng-true-value="0"
+        server-error>
+    <info>Do you consent to receive marketing materials from your league?</info>
+</field>
+
 <!-- passport nationality -->
 <field name="passport_nationality" label="Passport Nationality">
     <div class="form-inline">

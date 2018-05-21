@@ -173,6 +173,16 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
     "</field>\n" +
     "\n" +
+    "<field name=\"Marketing Opt In\">\n" +
+    "    <input type=\"checkbox\"\n" +
+    "        name=\"marketing_opt_in\"\n" +
+    "        ng-model=\"person.marketing_opt_in\"\n" +
+    "        ng-true-value=\"1\"\n" +
+    "        ng-true-value=\"0\"\n" +
+    "        server-error>\n" +
+    "    <info>Do you consent to receive marketing materials from your league?</info>\n" +
+    "</field>\n" +
+    "\n" +
     "<!-- passport nationality -->\n" +
     "<field name=\"passport_nationality\" label=\"Passport Nationality\">\n" +
     "    <div class=\"form-inline\">\n" +
