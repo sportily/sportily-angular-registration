@@ -7,6 +7,16 @@
         <div ng-include="'templates/sportily/registration/form.roles.html'"></div>
         <div ng-include="'templates/sportily/registration/form.contact.html'"></div>
 
+        <field name="Contact Opt In">
+            <input type="checkbox"
+                name="marketing_opt_in"
+                ng-model="person.marketing_opt_in"
+                ng-true-value="1"
+                ng-true-value="0"
+                server-error>
+            <info>I would like to receive periodic and informative marketing or newsletter updates on the league.</info>
+        </field>
+
         <field name="agreement" label="none">
             <label>
                 <input type="checkbox" ng-model="state.agreement" required>
