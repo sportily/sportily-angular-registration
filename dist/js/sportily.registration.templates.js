@@ -91,6 +91,16 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
     "\n" +
+    "        <field name=\"League Marketing Opt In\">\n" +
+    "            <input type=\"checkbox\"\n" +
+    "                name=\"marketing_opt_in\"\n" +
+    "                ng-model=\"person.marketing_opt_in\"\n" +
+    "                ng-true-value=\"1\"\n" +
+    "                ng-true-value=\"0\"\n" +
+    "                server-error>\n" +
+    "            <info>I would like to receive periodic and informative marketing or newsletter updates on the league.</info>\n" +
+    "        </field>\n" +
+    "\n" +
     "        <field name=\"agreement\" label=\"none\">\n" +
     "            <label>\n" +
     "                <input type=\"checkbox\" ng-model=\"state.agreement\" required>\n" +
@@ -171,16 +181,6 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        ng-model=\"person.dbs_number\"\n" +
     "        server-error>\n" +
     "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
-    "</field>\n" +
-    "\n" +
-    "<field name=\"Marketing Opt In\">\n" +
-    "    <input type=\"checkbox\"\n" +
-    "        name=\"marketing_opt_in\"\n" +
-    "        ng-model=\"person.marketing_opt_in\"\n" +
-    "        ng-true-value=\"1\"\n" +
-    "        ng-true-value=\"0\"\n" +
-    "        server-error>\n" +
-    "    <info>Do you consent to receive marketing materials or newsletters from your league?</info>\n" +
     "</field>\n" +
     "\n" +
     "<!-- passport nationality -->\n" +
