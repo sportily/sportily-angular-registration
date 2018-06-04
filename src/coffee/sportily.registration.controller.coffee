@@ -21,7 +21,8 @@ module.controller 'SportilyRegistrationCtrl', [
 
     ($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) ->
         $scope.user = {}
-        $scope.person = {}
+        $scope.person =
+          marketing_opt_in:false
         $scope.member = season_id: $scope.seasonId
         $scope.roles = [ type: null ]
         $scope.complete = false

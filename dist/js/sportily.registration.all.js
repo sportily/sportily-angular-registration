@@ -16,7 +16,9 @@
     '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
       var fetchAgeGroups, fetchCompetitions, fetchMember, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
-      $scope.person = {};
+      $scope.person = {
+        marketing_opt_in: false
+      };
       $scope.member = {
         season_id: $scope.seasonId
       };
@@ -662,7 +664,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "                name=\"marketing_opt_in\"\n" +
     "                ng-model=\"person.marketing_opt_in\"\n" +
     "                ng-true-value=\"1\"\n" +
-    "                ng-true-value=\"0\"\n" +
+    "                ng-false-value=\"0\"\n" +
     "                server-error>\n" +
     "            <info>I would like to receive periodic and informative marketing or newsletter updates on the league.</info>\n" +
     "        </field>\n" +

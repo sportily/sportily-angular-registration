@@ -16,7 +16,9 @@
     '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
       var fetchAgeGroups, fetchCompetitions, fetchMember, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
-      $scope.person = {};
+      $scope.person = {
+        marketing_opt_in: false
+      };
       $scope.member = {
         season_id: $scope.seasonId
       };
