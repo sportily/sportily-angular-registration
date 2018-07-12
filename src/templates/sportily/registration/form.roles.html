@@ -6,7 +6,7 @@
 
     <div class="form-group">
         <select class="form-control"
-            ng-options="c.id as c.organisation.name for c in competitions"
+            ng-options="c.id as (c.organisation.name + ' - ' + c.name)  for c in competitions"
             ng-model="role.competition_id">
             <option value="">Region&hellip;</option>
         </select>

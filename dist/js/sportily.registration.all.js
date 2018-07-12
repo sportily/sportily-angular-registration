@@ -1020,7 +1020,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"c.id as c.organisation.name for c in competitions\"\n" +
+    "            ng-options=\"c.id as (c.organisation.name + ' - ' + c.name)  for c in competitions\"\n" +
     "            ng-model=\"role.competition_id\">\n" +
     "            <option value=\"\">Region&hellip;</option>\n" +
     "        </select>\n" +
