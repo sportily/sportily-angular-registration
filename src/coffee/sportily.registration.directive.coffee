@@ -6,8 +6,7 @@ module.directive 'sportilyRegistration', ->
     controller: 'SportilyRegistrationCtrl'
     templateUrl: 'templates/sportily/registration/form.html'
     scope:
-        registrationId: '@registration'
-        seasonId: '@season'
+        organisationId: '@organisation'
         agreementMessage: '@'
         confirmationMessage: '@'
 

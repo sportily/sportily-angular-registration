@@ -1,8 +1,16 @@
 <form name="form" novalidate>
 
     <div class="alert alert-danger" ng-if="error">{{ error }}</div>
+    <div ng-if="!complete" class="form-group">
+       <label for="season">Season</label>
+        <select class="form-control"
+            ng-options="season.id as season.name for season in seasons"
+            ng-model="state.selectedSeason">
+            <option value="">Season&hellip;</option>
+        </select>
+    </div>
 
-    <div ng-if="!complete">
+    <div ng-if="!complete && state.selectedSeason">
         <div ng-include="'templates/sportily/registration/form.personal.html'"></div>
         <div ng-include="'templates/sportily/registration/form.roles.html'"></div>
         <div ng-include="'templates/sportily/registration/form.contact.html'"></div>

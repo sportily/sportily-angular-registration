@@ -85,8 +85,16 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "<form name=\"form\" novalidate>\n" +
     "\n" +
     "    <div class=\"alert alert-danger\" ng-if=\"error\">{{ error }}</div>\n" +
+    "    <div ng-if=\"!complete\" class=\"form-group\">\n" +
+    "       <label for=\"season\">Season</label>\n" +
+    "        <select class=\"form-control\"\n" +
+    "            ng-options=\"season.id as season.name for season in seasons\"\n" +
+    "            ng-model=\"state.selectedSeason\">\n" +
+    "            <option value=\"\">Season&hellip;</option>\n" +
+    "        </select>\n" +
+    "    </div>\n" +
     "\n" +
-    "    <div ng-if=\"!complete\">\n" +
+    "    <div ng-if=\"!complete && state.selectedSeason\">\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +

@@ -15,15 +15,15 @@ module.controller 'SportilyRegistrationCtrl', [
     'Members'
     'People'
     'Roles'
+    'Seasons'
     'Teams'
     'Types'
     'Users'
 
-    ($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) ->
+    ($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Seasons, Teams, Types, Users) ->
         $scope.user = {}
         $scope.person =
           marketing_opt_in:false
-        $scope.member = season_id: $scope.seasonId
         $scope.roles = [ type: null ]
         $scope.complete = false
 
@@ -36,6 +36,8 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.state =
             agreement: false
             dateOfBirth: ''
+            selectedSeason: null
+
 
 
         ##
@@ -78,8 +80,13 @@ module.controller 'SportilyRegistrationCtrl', [
                   $scope.member = member
                   $scope.complete = true
                   $scope.error = null
+                  season = _.find($scope.seasons, (s) => s.id == $scope.state.selectedSeason)
+                  $scope.agreementMessage = $scope.agreementMessage.replace('SEASON_NAME', season.name)
                 .catch Form.showErrors($scope)
 
+        fetchSeasons = ->
+          Seasons.getList({'organisation_id': $scope.organisationId}).then (seasons) ->
+            $scope.seasons = seasons.filter (s) -> s.status == 'open'
 
         ##
         ## Fetch a list of all the age groups for the current season.
@@ -92,7 +99,7 @@ module.controller 'SportilyRegistrationCtrl', [
         ## period.
         ##
         fetchCompetitions = ->
-            filter = season_id: $scope.seasonId, include: 'organisation'
+            filter = season_id: $scope.state.selectedSeason, include: 'organisation'
             Competitions.getList(filter).then (competitions) ->
                 $scope.competitions = competitions
 
@@ -101,7 +108,7 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Fetch a list of all the age groups for the current season.
         ##
         fetchAgeGroups = ->
-            filter = season_id: $scope.seasonId
+            filter = season_id: $scope.state.selectedSeason
             AgeGroups.getList(filter).then (ageGroups) ->
                 $scope.ageGroups = ageGroups
 
@@ -110,7 +117,7 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Fetch a list of all the teams for the current registration period.
         ##
         fetchTeams = ->
-            filter = season_id: $scope.seasonId
+            filter = season_id: $scope.state.selectedSeason
             Teams.getList(filter).then (teams) ->
                 $scope.teams = teams
 
@@ -157,10 +164,16 @@ module.controller 'SportilyRegistrationCtrl', [
 
 
         # initialise the scope with necessary data.
-        fetchCompetitions()
-        fetchAgeGroups()
-        fetchTeams()
+        fetchSeasons();
 
+#
+
+        $scope.$watch 'state.selectedSeason', (value) ->
+            if $scope.state.selectedSeason
+              $scope.member = season_id: $scope.state.selectedSeason
+              fetchCompetitions()
+              fetchAgeGroups()
+              fetchTeams()
 
         # watch the date of birth for changes, and update the person model
         # ensuring that we support dates as Date objects (as provided by date

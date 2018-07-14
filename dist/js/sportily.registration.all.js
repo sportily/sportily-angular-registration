@@ -13,14 +13,11 @@
   NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Teams, Types, Users) {
-      var fetchAgeGroups, fetchCompetitions, fetchMember, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
+    '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Seasons, Teams, Types, Users) {
+      var fetchAgeGroups, fetchCompetitions, fetchMember, fetchSeasons, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
         marketing_opt_in: false
-      };
-      $scope.member = {
-        season_id: $scope.seasonId
       };
       $scope.roles = [
         {
@@ -38,7 +35,8 @@
       }).sortBy('index').value();
       $scope.state = {
         agreement: false,
-        dateOfBirth: ''
+        dateOfBirth: '',
+        selectedSeason: null
       };
       $scope.addRole = function() {
         return $scope.roles.push({
@@ -64,10 +62,26 @@
       };
       $scope.save = function() {
         return Form.isValid($scope).then(verifyRoles).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(fetchMember).then(function(member) {
+          var season;
           $scope.member = member;
           $scope.complete = true;
-          return $scope.error = null;
+          $scope.error = null;
+          season = _.find($scope.seasons, (function(_this) {
+            return function(s) {
+              return s.id === $scope.state.selectedSeason;
+            };
+          })(this));
+          return $scope.agreementMessage = $scope.agreementMessage.replace('SEASON_NAME', season.name);
         })["catch"](Form.showErrors($scope));
+      };
+      fetchSeasons = function() {
+        return Seasons.getList({
+          'organisation_id': $scope.organisationId
+        }).then(function(seasons) {
+          return $scope.seasons = seasons.filter(function(s) {
+            return s.status === 'open';
+          });
+        });
       };
       fetchMember = function() {
         return Members.one($scope.member_id).get();
@@ -75,7 +89,7 @@
       fetchCompetitions = function() {
         var filter;
         filter = {
-          season_id: $scope.seasonId,
+          season_id: $scope.state.selectedSeason,
           include: 'organisation'
         };
         return Competitions.getList(filter).then(function(competitions) {
@@ -85,7 +99,7 @@
       fetchAgeGroups = function() {
         var filter;
         filter = {
-          season_id: $scope.seasonId
+          season_id: $scope.state.selectedSeason
         };
         return AgeGroups.getList(filter).then(function(ageGroups) {
           return $scope.ageGroups = ageGroups;
@@ -94,7 +108,7 @@
       fetchTeams = function() {
         var filter;
         filter = {
-          season_id: $scope.seasonId
+          season_id: $scope.state.selectedSeason
         };
         return Teams.getList(filter).then(function(teams) {
           return $scope.teams = teams;
@@ -127,9 +141,17 @@
         });
         return $q.all(rolePromises);
       };
-      fetchCompetitions();
-      fetchAgeGroups();
-      fetchTeams();
+      fetchSeasons();
+      $scope.$watch('state.selectedSeason', function(value) {
+        if ($scope.state.selectedSeason) {
+          $scope.member = {
+            season_id: $scope.state.selectedSeason
+          };
+          fetchCompetitions();
+          fetchAgeGroups();
+          return fetchTeams();
+        }
+      });
       return $scope.$watch('state.dateOfBirth', function(value) {
         var dob, input, output;
         input = 'DD/MM/YYYY';
@@ -165,8 +187,7 @@
       controller: 'SportilyRegistrationCtrl',
       templateUrl: 'templates/sportily/registration/form.html',
       scope: {
-        registrationId: '@registration',
-        seasonId: '@season',
+        organisationId: '@organisation',
         agreementMessage: '@',
         confirmationMessage: '@'
       }
@@ -653,8 +674,16 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "<form name=\"form\" novalidate>\n" +
     "\n" +
     "    <div class=\"alert alert-danger\" ng-if=\"error\">{{ error }}</div>\n" +
+    "    <div ng-if=\"!complete\" class=\"form-group\">\n" +
+    "       <label for=\"season\">Season</label>\n" +
+    "        <select class=\"form-control\"\n" +
+    "            ng-options=\"season.id as season.name for season in seasons\"\n" +
+    "            ng-model=\"state.selectedSeason\">\n" +
+    "            <option value=\"\">Season&hellip;</option>\n" +
+    "        </select>\n" +
+    "    </div>\n" +
     "\n" +
-    "    <div ng-if=\"!complete\">\n" +
+    "    <div ng-if=\"!complete && state.selectedSeason\">\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
