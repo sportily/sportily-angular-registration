@@ -495,7 +495,7 @@
             target_id: null,
             status: 'pending',
             organisation_id: region.id,
-            paid_to_organisation_id: national.id,
+            target_organisation_id: national.id,
             method: "online"
           });
         });
@@ -506,7 +506,7 @@
           target_id: null,
           status: 'pending',
           organisation_id: national.id,
-          paid_to_organisation_id: null,
+          target_organisation_id: null,
           method: "online"
         });
         promises.push(nationalPromise);
