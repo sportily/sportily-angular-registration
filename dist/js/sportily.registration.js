@@ -506,7 +506,7 @@
           target_id: null,
           status: 'pending',
           organisation_id: national.id,
-          target_organisation_id: null,
+          target_organisation_id: national.id,
           method: "online"
         });
         promises.push(nationalPromise);
