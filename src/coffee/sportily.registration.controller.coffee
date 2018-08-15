@@ -81,7 +81,7 @@ module.controller 'SportilyRegistrationCtrl', [
                   $scope.complete = true
                   $scope.error = null
                   season = _.find($scope.seasons, (s) => s.id == $scope.state.selectedSeason)
-                  $scope.agreementMessage = $scope.agreementMessage.replace('SEASON_NAME', season.name)
+                  $scope.confirmationMessage = $scope.confirmationMessage.replace('SEASON_NAME', season.name)
                 .catch Form.showErrors($scope)
 
         fetchSeasons = ->
@@ -156,11 +156,16 @@ module.controller 'SportilyRegistrationCtrl', [
         ##
         saveRoles = (member) ->
             $scope.member_id = member.id
-            rolePromises = []
-            $scope.roles.forEach (role) ->
+            $scope.roles.reduce (p, role) =>
                 role.member_id = member.id
-                rolePromises.push(Roles.post(role))
-            return $q.all(rolePromises);
+                p.then () => Roles.post(role)
+            , $q.resolve()
+                        # [ ...chainResults, currentResult ]
+            # rolePromises = []
+            # $scope.roles.forEach (role) ->
+            #     role.member_id = member.id
+            #     rolePromises.push(Roles.post(role))
+            # return $q.all(rolePromises);
 
 
         # initialise the scope with necessary data.

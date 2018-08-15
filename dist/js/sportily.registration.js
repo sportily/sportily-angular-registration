@@ -71,7 +71,7 @@
               return s.id === $scope.state.selectedSeason;
             };
           })(this));
-          return $scope.agreementMessage = $scope.agreementMessage.replace('SEASON_NAME', season.name);
+          return $scope.confirmationMessage = $scope.confirmationMessage.replace('SEASON_NAME', season.name);
         })["catch"](Form.showErrors($scope));
       };
       fetchSeasons = function() {
@@ -132,14 +132,15 @@
         return Members.post($scope.member);
       };
       saveRoles = function(member) {
-        var rolePromises;
         $scope.member_id = member.id;
-        rolePromises = [];
-        $scope.roles.forEach(function(role) {
-          role.member_id = member.id;
-          return rolePromises.push(Roles.post(role));
-        });
-        return $q.all(rolePromises);
+        return $scope.roles.reduce((function(_this) {
+          return function(p, role) {
+            role.member_id = member.id;
+            return p.then(function() {
+              return Roles.post(role);
+            });
+          };
+        })(this), $q.resolve());
       };
       fetchSeasons();
       $scope.$watch('state.selectedSeason', function(value) {
