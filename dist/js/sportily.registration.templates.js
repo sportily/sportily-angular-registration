@@ -473,7 +473,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
-    "\n" +
+    "    \n" +
     "    <div class=\"form-group\" ng-show=\"role.competition_id && types[role.type].requiresTeam\">\n" +
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
