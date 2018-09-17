@@ -26,7 +26,9 @@
       ];
       $scope.complete = false;
       $scope.types = Types;
-      $scope.typeOptions = _(Types).map(function(value, key) {
+      $scope.typeOptions = _(Types).filter(function(t) {
+        return t.name !== 'Player (Cross Registration)' || $scope.organisationId === "36";
+      }).map(function(value, key) {
         return {
           key: key,
           label: value.name,

@@ -29,6 +29,8 @@ module.controller 'SportilyRegistrationCtrl', [
 
         $scope.types = Types
         $scope.typeOptions = _(Types)
+            #quick hack to remove cross registration from leagues other than brha
+            .filter (t) -> t.name != 'Player (Cross Registration)' || $scope.organisationId == "36"
             .map (value, key) -> key: key, label: value.name, index: value.index
             .sortBy 'index'
             .value()
