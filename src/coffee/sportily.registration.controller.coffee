@@ -30,8 +30,6 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.types = Types
         $scope.typeOptions = _(Types)
             .map (value, key) -> key: key, label: value.name, index: value.index
-            .filter (t) -> t.key != 'player_cross_registration' || $scope.organisationId == "36"
-
             .sortBy 'index'
             .value()
 
@@ -162,7 +160,7 @@ module.controller 'SportilyRegistrationCtrl', [
                 role.member_id = member.id
                 p.then () => Roles.post(role)
             , $q.resolve()
-                        # [ ...chainResults, currentResult ]
+
             # rolePromises = []
             # $scope.roles.forEach (role) ->
             #     role.member_id = member.id

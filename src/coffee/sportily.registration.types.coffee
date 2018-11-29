@@ -21,6 +21,7 @@ module.constant 'Types',
     official:
         index: 4
         name: 'Non-Bench Official'
+        requiresTeam: true
 
     committee:
         index: 5

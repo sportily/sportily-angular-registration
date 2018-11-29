@@ -32,8 +32,6 @@
           label: value.name,
           index: value.index
         };
-      }).filter(function(t) {
-        return t.key !== 'player_cross_registration' || $scope.organisationId === "36";
       }).sortBy('index').value();
       $scope.state = {
         agreement: false,
@@ -552,7 +550,8 @@
     },
     official: {
       index: 4,
-      name: 'Non-Bench Official'
+      name: 'Non-Bench Official',
+      requiresTeam: true
     },
     committee: {
       index: 5,
