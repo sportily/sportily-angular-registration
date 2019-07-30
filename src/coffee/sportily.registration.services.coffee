@@ -1,33 +1,23 @@
-module = angular.module('sportily.registration.services', []);
+module = angular.module('sportily.registration.services', ['sportily.api']);
 
-module.factory 'StripeService', ($q, StripePublishableKey) ->
-      return {
-          getOneTimeToken: (amount, email) ->
-              deferred = $q.defer()
-              handler = StripeCheckout.configure({
-                   key: StripePublishableKey,
-                   name: "Pay League Fees",
-                   allowRememberMe: false,
-                   email: email,
-                   token: (token, args) ->
-                     deferred.resolve(token);
-                   ,
-                   closed: ->
-                     deferred.reject("form.closed");
-
+module.factory 'StripeService', ($q, StripePublishableKey, SportilyApi) ->
+         getSession: (amount, email, name, description, organisation) ->
+             return SportilyApi.all('stripe').customGET('', {
+                  amount: amount,
+                  email: email,
+                  name: name,
+                  source: 'website',
+                  description: description,
+                  organisation_id: organisation.id
               })
+          redirectToPayment: (stripeAccountId, sessionId) ->
+            stripe = Stripe(StripePublishableKey, {
+                stripeAccount: stripeAccountId
+            });
 
-              options = {
-                description: "Sportily League Fees",
-                zipCode: true,
-                currency: "gbp",
-                amount: amount
-              }
-
-              handler.open(options);
-              return deferred.promise;
-
-        }
+            return stripe.redirectToCheckout({
+              sessionId: sessionId
+            })
 
 module.factory 'PaymentService', ($q, Transactions, Payments) ->
        getNational = (member) ->
@@ -55,7 +45,7 @@ module.factory 'PaymentService', ($q, Transactions, Payments) ->
           return regions;
 
         return {
-            take: (stripeToken, member, amount) ->
+            take: (stripeSessionId, member, amount) ->
               national = getNational(member);
               regions = getRegionals(member);
               promises = regions.map((region) ->
@@ -88,7 +78,7 @@ module.factory 'PaymentService', ($q, Transactions, Payments) ->
                   return Payments.post({
                     amount: member.financial_summary.owed.total,
                     organisation_id: national.id,
-                    stripe_payment_token: stripeToken.id,
+                    stripe_payment_token: stripeSessionId,
                     transaction_ids: transactions.map((transaction) ->  return transaction.id; )
                   });
               );

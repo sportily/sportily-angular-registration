@@ -9,9 +9,11 @@ module.directive 'sportilyRegistration', ->
         organisationId: '@organisation'
         agreementMessage: '@'
         confirmationMessage: '@'
+        adminUrl: '@'
+        paid: '='
 
 
-module.directive('paymentButton', ($q, StripeService, Organisations, PaymentService, Members) ->
+module.directive('paymentButton', ($q, StripeService, Organisations, PaymentService, Members, Restangular) ->
     getTotal = (member) ->
        member.financial_summary.owed.total if member.financial_summary
 
@@ -48,22 +50,17 @@ module.directive('paymentButton', ($q, StripeService, Organisations, PaymentServ
           arePaymentsPossible($scope);
           $scope.total = getTotal($scope.member);
 
+
           $scope.pay = ->
 
-              StripeService.getOneTimeToken($scope.total, $scope.email).then((stripeToken) ->
-                return PaymentService.take(stripeToken, $scope.member);
-              ).then((payment) ->
-                if (payment.status == 'complete')
-                  Members.one($scope.member.id).get().then((member) ->
-                    $scope.member = member;
-                    $scope.total = getTotal($scope.member);
-
-                  ).then( ->
-                    $scope.message = { type:'success', message: 'Payment completed successfully.' }
-                  );
-              ).catch((error) ->
-                  $scope.message = { type: 'danger', message: 'Payment unsuccessful.'};
-              );
+              return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.nationalOrganisation.name + ' League Registration Fees', $scope.nationalOrganisation
+              ).then((session) ->
+                  return PaymentService.take(session.id, $scope.member, $scope.amount).then(() ->
+                      return session;
+                  )
+              ).then((session) ->
+                  return StripeService.redirectToPayment($scope.nationalOrganisation.stripe_user_id, session.id)
+              )
 
       }
 );

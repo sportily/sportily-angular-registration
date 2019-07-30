@@ -38,8 +38,6 @@ module.controller 'SportilyRegistrationCtrl', [
             dateOfBirth: ''
             selectedSeason: null
 
-
-
         ##
         ## Add a new, undefined, role to the scope.
         ##

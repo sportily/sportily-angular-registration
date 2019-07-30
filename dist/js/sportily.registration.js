@@ -190,12 +190,14 @@
       scope: {
         organisationId: '@organisation',
         agreementMessage: '@',
-        confirmationMessage: '@'
+        confirmationMessage: '@',
+        adminUrl: '@',
+        paid: '='
       }
     };
   });
 
-  module.directive('paymentButton', function($q, StripeService, Organisations, PaymentService, Members) {
+  module.directive('paymentButton', function($q, StripeService, Organisations, PaymentService, Members, Restangular) {
     var arePaymentsPossible, getNationalId, getTotal;
     getTotal = function(member) {
       if (member.financial_summary) {
@@ -240,25 +242,12 @@
         arePaymentsPossible($scope);
         $scope.total = getTotal($scope.member);
         return $scope.pay = function() {
-          return StripeService.getOneTimeToken($scope.total, $scope.email).then(function(stripeToken) {
-            return PaymentService.take(stripeToken, $scope.member);
-          }).then(function(payment) {
-            if (payment.status === 'complete') {
-              return Members.one($scope.member.id).get().then(function(member) {
-                $scope.member = member;
-                return $scope.total = getTotal($scope.member);
-              }).then(function() {
-                return $scope.message = {
-                  type: 'success',
-                  message: 'Payment completed successfully.'
-                };
-              });
-            }
-          })["catch"](function(error) {
-            return $scope.message = {
-              type: 'danger',
-              message: 'Payment unsuccessful.'
-            };
+          return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.nationalOrganisation.name + ' League Registration Fees', $scope.nationalOrganisation).then(function(session) {
+            return PaymentService.take(session.id, $scope.member, $scope.amount).then(function() {
+              return session;
+            });
+          }).then(function(session) {
+            return StripeService.redirectToPayment($scope.nationalOrganisation.stripe_user_id, session.id);
           });
         };
       }
@@ -424,33 +413,28 @@
 (function() {
   var module;
 
-  module = angular.module('sportily.registration.services', []);
+  module = angular.module('sportily.registration.services', ['sportily.api']);
 
-  module.factory('StripeService', function($q, StripePublishableKey) {
+  module.factory('StripeService', function($q, StripePublishableKey, SportilyApi) {
     return {
-      getOneTimeToken: function(amount, email) {
-        var deferred, handler, options;
-        deferred = $q.defer();
-        handler = StripeCheckout.configure({
-          key: StripePublishableKey,
-          name: "Pay League Fees",
-          allowRememberMe: false,
+      getSession: function(amount, email, name, description, organisation) {
+        return SportilyApi.all('stripe').customGET('', {
+          amount: amount,
           email: email,
-          token: function(token, args) {
-            return deferred.resolve(token);
-          },
-          closed: function() {
-            return deferred.reject("form.closed");
-          }
+          name: name,
+          source: 'website',
+          description: description,
+          organisation_id: organisation.id
         });
-        options = {
-          description: "Sportily League Fees",
-          zipCode: true,
-          currency: "gbp",
-          amount: amount
-        };
-        handler.open(options);
-        return deferred.promise;
+      },
+      redirectToPayment: function(stripeAccountId, sessionId) {
+        var stripe;
+        stripe = Stripe(StripePublishableKey, {
+          stripeAccount: stripeAccountId
+        });
+        return stripe.redirectToCheckout({
+          sessionId: sessionId
+        });
       }
     };
   });
@@ -484,7 +468,7 @@
       return regions;
     };
     return {
-      take: function(stripeToken, member, amount) {
+      take: function(stripeSessionId, member, amount) {
         var national, nationalPromise, promises, regions;
         national = getNational(member);
         regions = getRegionals(member);
@@ -515,7 +499,7 @@
           return Payments.post({
             amount: member.financial_summary.owed.total,
             organisation_id: national.id,
-            stripe_payment_token: stripeToken.id,
+            stripe_payment_token: stripeSessionId,
             transaction_ids: transactions.map(function(transaction) {
               return transaction.id;
             })

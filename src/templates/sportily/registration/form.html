@@ -1,7 +1,7 @@
 <form name="form" novalidate>
 
     <div class="alert alert-danger" ng-if="error">{{ error }}</div>
-    <div ng-if="!complete" class="form-group">
+    <div ng-if="!complete && !paid" class="form-group">
        <label for="season">Season</label>
         <select class="form-control"
             ng-options="season.id as season.name for season in seasons"
@@ -10,7 +10,7 @@
         </select>
     </div>
 
-    <div ng-if="!complete && state.selectedSeason">
+    <div ng-if="!complete && !paid && state.selectedSeason">
         <div ng-include="'templates/sportily/registration/form.personal.html'"></div>
         <div ng-include="'templates/sportily/registration/form.roles.html'"></div>
         <div ng-include="'templates/sportily/registration/form.contact.html'"></div>
@@ -35,11 +35,16 @@
         <button class="btn btn-primary" ng-click="save()" ng-disabled="!state.agreement">Register</button>
     </div>
 
-    <div ng-if="complete">
+    <div ng-if="complete && !paid">
         <p>{{ confirmationMessage }}</p>
         <p ng-if="message" class="alert alert-{{message.type}}">{{message.message}}</p>
         <p ng-if="member.financial_summary.owed.total"> Your member fees are: {{ member.financial_summary.owed.total | money }}
         <p><payment-button email="user.email" member="member" message="message"></payment-button></p>
     </div>
 
+    <div ng-if="paid">
+        <p>Payment</p>
+        <p class="alert alert-success">Payment made successfully.</p>
+        <p><a href="{{ adminUrl }}">Login</a> to your account.
+    </div>
 </form>

@@ -85,7 +85,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "<form name=\"form\" novalidate>\n" +
     "\n" +
     "    <div class=\"alert alert-danger\" ng-if=\"error\">{{ error }}</div>\n" +
-    "    <div ng-if=\"!complete\" class=\"form-group\">\n" +
+    "    <div ng-if=\"!complete && !paid\" class=\"form-group\">\n" +
     "       <label for=\"season\">Season</label>\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"season.id as season.name for season in seasons\"\n" +
@@ -94,7 +94,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        </select>\n" +
     "    </div>\n" +
     "\n" +
-    "    <div ng-if=\"!complete && state.selectedSeason\">\n" +
+    "    <div ng-if=\"!complete && !paid && state.selectedSeason\">\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
@@ -119,13 +119,18 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"!state.agreement\">Register</button>\n" +
     "    </div>\n" +
     "\n" +
-    "    <div ng-if=\"complete\">\n" +
+    "    <div ng-if=\"complete && !paid\">\n" +
     "        <p>{{ confirmationMessage }}</p>\n" +
     "        <p ng-if=\"message\" class=\"alert alert-{{message.type}}\">{{message.message}}</p>\n" +
     "        <p ng-if=\"member.financial_summary.owed.total\"> Your member fees are: {{ member.financial_summary.owed.total | money }}\n" +
     "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\"></payment-button></p>\n" +
     "    </div>\n" +
     "\n" +
+    "    <div ng-if=\"paid\">\n" +
+    "        <p>Payment</p>\n" +
+    "        <p class=\"alert alert-success\">Payment made successfully.</p>\n" +
+    "        <p><a href=\"{{ adminUrl }}\">Login</a> to your account.\n" +
+    "    </div>\n" +
     "</form>\n" +
     "");
 }]);
