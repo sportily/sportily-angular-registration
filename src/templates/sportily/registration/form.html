@@ -1,4 +1,4 @@
-<form name="form" novalidate>
+<form name="form">
 
     <div class="alert alert-danger" ng-if="error">{{ error }}</div>
     <div ng-if="!complete && !paid" class="form-group">
@@ -31,8 +31,8 @@
                 {{ agreementMessage }}
             </label>
         </field>
-
-        <button class="btn btn-primary" ng-click="save()" ng-disabled="!state.agreement">Register</button>
+        valid {{form.$invalid}}
+        <button class="btn btn-primary" ng-click="save()" ng-disabled="form.$invalid">Register</button>
     </div>
 
     <div ng-if="complete && !paid">

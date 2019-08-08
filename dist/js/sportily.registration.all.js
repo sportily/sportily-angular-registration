@@ -657,7 +657,7 @@ angular.module("templates/sportily/registration/form.contact.html", []).run(["$t
 
 angular.module("templates/sportily/registration/form.html", []).run(["$templateCache", function ($templateCache) {
   $templateCache.put("templates/sportily/registration/form.html",
-    "<form name=\"form\" novalidate>\n" +
+    "<form name=\"form\">\n" +
     "\n" +
     "    <div class=\"alert alert-danger\" ng-if=\"error\">{{ error }}</div>\n" +
     "    <div ng-if=\"!complete && !paid\" class=\"form-group\">\n" +
@@ -690,8 +690,8 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "                {{ agreementMessage }}\n" +
     "            </label>\n" +
     "        </field>\n" +
-    "\n" +
-    "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"!state.agreement\">Register</button>\n" +
+    "        valid {{form.$invalid}}\n" +
+    "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"form.$invalid\">Register</button>\n" +
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"complete && !paid\">\n" +
