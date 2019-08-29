@@ -115,8 +115,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "                {{ agreementMessage }}\n" +
     "            </label>\n" +
     "        </field>\n" +
-    "        valid {{form.$invalid}}\n" +
-    "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"form.$invalid\">Register</button>\n" +
+    "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"form.$invalid || saving\">Register</button>\n" +
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"complete && !paid\">\n" +

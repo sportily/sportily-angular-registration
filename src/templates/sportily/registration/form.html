@@ -31,8 +31,7 @@
                 {{ agreementMessage }}
             </label>
         </field>
-        valid {{form.$invalid}}
-        <button class="btn btn-primary" ng-click="save()" ng-disabled="form.$invalid">Register</button>
+        <button class="btn btn-primary" ng-click="save()" ng-disabled="form.$invalid || saving">Register</button>
     </div>
 
     <div ng-if="complete && !paid">

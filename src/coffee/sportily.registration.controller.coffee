@@ -67,6 +67,7 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Scope function to submit the form.
         ##
         $scope.save = ->
+            $scope.saving = true
             Form.isValid($scope)
                 .then verifyRoles
                 .then saveUser
@@ -80,7 +81,10 @@ module.controller 'SportilyRegistrationCtrl', [
                   $scope.error = null
                   season = _.find($scope.seasons, (s) => s.id == $scope.state.selectedSeason)
                   $scope.confirmationMessage = $scope.confirmationMessage.replace('SEASON_NAME', season.name)
-                .catch Form.showErrors($scope)
+                  $scope.saving = false
+                .catch () ->
+                  $scope.saving = false
+                  Form.showErrors($scope)
 
         fetchSeasons = ->
           Seasons.getList({'organisation_id': $scope.organisationId}).then (seasons) ->

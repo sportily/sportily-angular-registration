@@ -61,6 +61,7 @@
         }
       };
       $scope.save = function() {
+        $scope.saving = true;
         return Form.isValid($scope).then(verifyRoles).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(fetchMember).then(function(member) {
           var season;
           $scope.member = member;
@@ -71,8 +72,12 @@
               return s.id === $scope.state.selectedSeason;
             };
           })(this));
-          return $scope.confirmationMessage = $scope.confirmationMessage.replace('SEASON_NAME', season.name);
-        })["catch"](Form.showErrors($scope));
+          $scope.confirmationMessage = $scope.confirmationMessage.replace('SEASON_NAME', season.name);
+          return $scope.saving = false;
+        })["catch"](function() {
+          $scope.saving = false;
+          return Form.showErrors($scope);
+        });
       };
       fetchSeasons = function() {
         return Seasons.getList({
@@ -690,8 +695,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "                {{ agreementMessage }}\n" +
     "            </label>\n" +
     "        </field>\n" +
-    "        valid {{form.$invalid}}\n" +
-    "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"form.$invalid\">Register</button>\n" +
+    "        <button class=\"btn btn-primary\" ng-click=\"save()\" ng-disabled=\"form.$invalid || saving\">Register</button>\n" +
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"complete && !paid\">\n" +
