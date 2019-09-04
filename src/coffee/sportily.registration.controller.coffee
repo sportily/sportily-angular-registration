@@ -82,6 +82,8 @@ module.controller 'SportilyRegistrationCtrl', [
                   season = _.find($scope.seasons, (s) => s.id == $scope.state.selectedSeason)
                   $scope.confirmationMessage = $scope.confirmationMessage.replace('SEASON_NAME', season.name)
                   $scope.saving = false
+                  window.parent.postMessage('scroll_top', '*')
+                  window.scrollTo(0,0);
                 .catch () ->
                   $scope.saving = false
                   Form.showErrors($scope)
@@ -181,6 +183,7 @@ module.controller 'SportilyRegistrationCtrl', [
               fetchCompetitions()
               fetchAgeGroups()
               fetchTeams()
+
 
         # watch the date of birth for changes, and update the person model
         # ensuring that we support dates as Date objects (as provided by date

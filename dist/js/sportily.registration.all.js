@@ -73,7 +73,9 @@
             };
           })(this));
           $scope.confirmationMessage = $scope.confirmationMessage.replace('SEASON_NAME', season.name);
-          return $scope.saving = false;
+          $scope.saving = false;
+          window.parent.postMessage('scroll_top', '*');
+          return window.scrollTo(0, 0);
         })["catch"](function() {
           $scope.saving = false;
           return Form.showErrors($scope);
