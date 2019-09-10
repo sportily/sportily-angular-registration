@@ -6,24 +6,31 @@
 
     <div class="form-group">
         <select class="form-control"
-            ng-options="c.id as (c.organisation.name + ' - ' + c.name)  for c in competitions"
-            ng-model="role.competition_id">
+            ng-options="r.id as r.name for r in regions"
+            ng-model="state.selectedRegionId">
             <option value="">Region&hellip;</option>
         </select>
     </div>
+    <div class="form-group" ng-show="state.selectedRegionId">
+        <select class="form-control"
+            ng-options="a.id as a.name for a in ageGroups"
+            ng-model="state.selectedAgeGroupId">
+            <option value="">Age Group&hellip;</option>
+        </select>
+    </div>
 
-    <div class="form-group" ng-show="role.competition_id">
+    <div class="form-group" ng-show="state.selectedRegionId">
         <select class="form-control"
             ng-options="type.key as type.label for type in typeOptions"
             ng-model="role.type">
             <option value="">Role&hellip;</option>
         </select>
     </div>
-    
-    <div class="form-group" ng-show="role.competition_id && types[role.type].requiresTeam">
+
+    <div class="form-group" ng-show="state.selectedRegionId && types[role.type].requiresTeam">
         <span>for</span>
         <select class="form-control"
-            ng-options="team.id as team.name + ' (' + ageGroups.lookup[team.age_group_id].name + ')' for team in teams|forCompetition:role.competition_id"
+            ng-options="team.id as team.name for team in teams"
             ng-model="role.team_id" ng-required="types[role.type].requiresTeam">
             <option value="">Team&hellip;</option>
         </select>

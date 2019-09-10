@@ -13,8 +13,8 @@
   NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'Form', 'AgeGroups', 'Competitions', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Competitions, Members, People, Roles, Seasons, Teams, Types, Users) {
-      var fetchAgeGroups, fetchCompetitions, fetchMember, fetchSeasons, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
+    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, Types, Users) {
+      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchSeasons, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
         marketing_opt_in: false
@@ -36,7 +36,9 @@
       $scope.state = {
         agreement: false,
         dateOfBirth: '',
-        selectedSeason: null
+        selectedSeason: null,
+        selectedRegionId: null,
+        selectedAgeGroupId: null
       };
       $scope.addRole = function() {
         return $scope.roles.push({
@@ -51,7 +53,7 @@
       roleIsValid = function(role) {
         var rule;
         rule = Types[role.type];
-        return role.competition_id && role.type && (!rule.requiresTeam || role.team_id);
+        return role.type && (!rule.requiresTeam || role.team_id);
       };
       verifyRoles = function() {
         var valid;
@@ -93,14 +95,23 @@
       fetchMember = function() {
         return Members.one($scope.member_id).get();
       };
-      fetchCompetitions = function() {
-        var filter;
-        filter = {
-          season_id: $scope.state.selectedSeason,
-          include: 'organisation'
-        };
-        return Competitions.getList(filter).then(function(competitions) {
-          return $scope.competitions = competitions;
+      fetchOrganisation = function() {
+        return Organisations.one($scope.organisationId).get({
+          include: 'regions'
+        }).then(function(organisation) {
+          $scope.regions = organisation.regions.data.map(function(r) {
+            return {
+              id: r.id,
+              name: r.name
+            };
+          });
+          $scope.regions.unshift({
+            id: organisation.id,
+            name: organisation.name
+          });
+          if (!organisation.regions.data.length) {
+            return $scope.state.selectedRegionId = organisation.id;
+          }
         });
       };
       fetchAgeGroups = function() {
@@ -115,10 +126,13 @@
       fetchTeams = function() {
         var filter;
         filter = {
-          season_id: $scope.state.selectedSeason
+          age_group_id: $scope.state.selectedAgeGroupId,
+          organisation_id: $scope.state.selectedRegionId
         };
         return Teams.getList(filter).then(function(teams) {
-          return $scope.teams = teams;
+          return $scope.teams = teams.filter(function(t) {
+            return t.competitions.data.length;
+          });
         });
       };
       saveUser = function() {
@@ -155,8 +169,12 @@
           $scope.member = {
             season_id: $scope.state.selectedSeason
           };
-          fetchCompetitions();
-          fetchAgeGroups();
+          fetchOrganisation();
+          return fetchAgeGroups();
+        }
+      });
+      $scope.$watch('state.selectedAgeGroupId', function(value) {
+        if ($scope.state.selectedAgeGroupId) {
           return fetchTeams();
         }
       });
@@ -1046,24 +1064,31 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"c.id as (c.organisation.name + ' - ' + c.name)  for c in competitions\"\n" +
-    "            ng-model=\"role.competition_id\">\n" +
+    "            ng-options=\"r.id as r.name for r in regions\"\n" +
+    "            ng-model=\"state.selectedRegionId\">\n" +
     "            <option value=\"\">Region&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
+    "        <select class=\"form-control\"\n" +
+    "            ng-options=\"a.id as a.name for a in ageGroups\"\n" +
+    "            ng-model=\"state.selectedAgeGroupId\">\n" +
+    "            <option value=\"\">Age Group&hellip;</option>\n" +
+    "        </select>\n" +
+    "    </div>\n" +
     "\n" +
-    "    <div class=\"form-group\" ng-show=\"role.competition_id\">\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"type.key as type.label for type in typeOptions\"\n" +
     "            ng-model=\"role.type\">\n" +
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
-    "    \n" +
-    "    <div class=\"form-group\" ng-show=\"role.competition_id && types[role.type].requiresTeam\">\n" +
+    "\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && types[role.type].requiresTeam\">\n" +
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"team.id as team.name + ' (' + ageGroups.lookup[team.age_group_id].name + ')' for team in teams|forCompetition:role.competition_id\"\n" +
+    "            ng-options=\"team.id as team.name for team in teams\"\n" +
     "            ng-model=\"role.team_id\" ng-required=\"types[role.type].requiresTeam\">\n" +
     "            <option value=\"\">Team&hellip;</option>\n" +
     "        </select>\n" +

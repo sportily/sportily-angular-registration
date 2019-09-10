@@ -1,6 +1,6 @@
 {
   "name": "sportily-angular-registration",
-  "version": "1.29.0",
+  "version": "1.30.0",
   "dependencies": {
     "moment": "~2.9.0",
     "restangular": "1.4.0",

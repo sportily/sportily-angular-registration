@@ -464,24 +464,31 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"c.id as (c.organisation.name + ' - ' + c.name)  for c in competitions\"\n" +
-    "            ng-model=\"role.competition_id\">\n" +
+    "            ng-options=\"r.id as r.name for r in regions\"\n" +
+    "            ng-model=\"state.selectedRegionId\">\n" +
     "            <option value=\"\">Region&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
+    "        <select class=\"form-control\"\n" +
+    "            ng-options=\"a.id as a.name for a in ageGroups\"\n" +
+    "            ng-model=\"state.selectedAgeGroupId\">\n" +
+    "            <option value=\"\">Age Group&hellip;</option>\n" +
+    "        </select>\n" +
+    "    </div>\n" +
     "\n" +
-    "    <div class=\"form-group\" ng-show=\"role.competition_id\">\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"type.key as type.label for type in typeOptions\"\n" +
     "            ng-model=\"role.type\">\n" +
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
-    "    \n" +
-    "    <div class=\"form-group\" ng-show=\"role.competition_id && types[role.type].requiresTeam\">\n" +
+    "\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && types[role.type].requiresTeam\">\n" +
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"team.id as team.name + ' (' + ageGroups.lookup[team.age_group_id].name + ')' for team in teams|forCompetition:role.competition_id\"\n" +
+    "            ng-options=\"team.id as team.name for team in teams\"\n" +
     "            ng-model=\"role.team_id\" ng-required=\"types[role.type].requiresTeam\">\n" +
     "            <option value=\"\">Team&hellip;</option>\n" +
     "        </select>\n" +
