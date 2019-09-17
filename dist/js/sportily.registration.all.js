@@ -123,14 +123,14 @@
           return $scope.ageGroups = ageGroups;
         });
       };
-      fetchTeams = function() {
+      fetchTeams = function(ageGroupId, roles) {
         var filter;
         filter = {
-          age_group_id: $scope.state.selectedAgeGroupId,
+          age_group_id: ageGroupId,
           organisation_id: $scope.state.selectedRegionId
         };
         return Teams.getList(filter).then(function(teams) {
-          return $scope.teams = teams.filter(function(t) {
+          return roles.teams = teams.filter(function(t) {
             return t.competitions.data.length;
           });
         });
@@ -164,6 +164,9 @@
         })(this), $q.resolve());
       };
       fetchSeasons();
+      $scope.getTeams = function(role) {
+        return fetchTeams(role.selectedAgeGroupId, role);
+      };
       $scope.$watch('state.selectedSeason', function(value) {
         if ($scope.state.selectedSeason) {
           $scope.member = {
@@ -171,11 +174,6 @@
           };
           fetchOrganisation();
           return fetchAgeGroups();
-        }
-      });
-      $scope.$watch('state.selectedAgeGroupId', function(value) {
-        if ($scope.state.selectedAgeGroupId) {
-          return fetchTeams();
         }
       });
       return $scope.$watch('state.dateOfBirth', function(value) {
@@ -1072,7 +1070,8 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"a.id as a.name for a in ageGroups\"\n" +
-    "            ng-model=\"state.selectedAgeGroupId\">\n" +
+    "            ng-model=\"role.selectedAgeGroupId\"\n" +
+    "            ng-change=\"getTeams(role)\">\n" +
     "            <option value=\"\">Age Group&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
@@ -1088,7 +1087,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && types[role.type].requiresTeam\">\n" +
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"team.id as team.name for team in teams\"\n" +
+    "            ng-options=\"team.id as team.name for team in role.teams\"\n" +
     "            ng-model=\"role.team_id\" ng-required=\"types[role.type].requiresTeam\">\n" +
     "            <option value=\"\">Team&hellip;</option>\n" +
     "        </select>\n" +

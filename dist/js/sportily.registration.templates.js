@@ -472,7 +472,8 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"a.id as a.name for a in ageGroups\"\n" +
-    "            ng-model=\"state.selectedAgeGroupId\">\n" +
+    "            ng-model=\"role.selectedAgeGroupId\"\n" +
+    "            ng-change=\"getTeams(role)\">\n" +
     "            <option value=\"\">Age Group&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
@@ -488,7 +489,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && types[role.type].requiresTeam\">\n" +
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"team.id as team.name for team in teams\"\n" +
+    "            ng-options=\"team.id as team.name for team in role.teams\"\n" +
     "            ng-model=\"role.team_id\" ng-required=\"types[role.type].requiresTeam\">\n" +
     "            <option value=\"\">Team&hellip;</option>\n" +
     "        </select>\n" +

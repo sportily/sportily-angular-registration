@@ -14,7 +14,8 @@
     <div class="form-group" ng-show="state.selectedRegionId">
         <select class="form-control"
             ng-options="a.id as a.name for a in ageGroups"
-            ng-model="state.selectedAgeGroupId">
+            ng-model="role.selectedAgeGroupId"
+            ng-change="getTeams(role)">
             <option value="">Age Group&hellip;</option>
         </select>
     </div>
@@ -30,7 +31,7 @@
     <div class="form-group" ng-show="state.selectedRegionId && types[role.type].requiresTeam">
         <span>for</span>
         <select class="form-control"
-            ng-options="team.id as team.name for team in teams"
+            ng-options="team.id as team.name for team in role.teams"
             ng-model="role.team_id" ng-required="types[role.type].requiresTeam">
             <option value="">Team&hellip;</option>
         </select>

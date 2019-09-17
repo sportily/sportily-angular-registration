@@ -123,14 +123,14 @@
           return $scope.ageGroups = ageGroups;
         });
       };
-      fetchTeams = function() {
+      fetchTeams = function(ageGroupId, roles) {
         var filter;
         filter = {
-          age_group_id: $scope.state.selectedAgeGroupId,
+          age_group_id: ageGroupId,
           organisation_id: $scope.state.selectedRegionId
         };
         return Teams.getList(filter).then(function(teams) {
-          return $scope.teams = teams.filter(function(t) {
+          return roles.teams = teams.filter(function(t) {
             return t.competitions.data.length;
           });
         });
@@ -164,6 +164,9 @@
         })(this), $q.resolve());
       };
       fetchSeasons();
+      $scope.getTeams = function(role) {
+        return fetchTeams(role.selectedAgeGroupId, role);
+      };
       $scope.$watch('state.selectedSeason', function(value) {
         if ($scope.state.selectedSeason) {
           $scope.member = {
@@ -171,11 +174,6 @@
           };
           fetchOrganisation();
           return fetchAgeGroups();
-        }
-      });
-      $scope.$watch('state.selectedAgeGroupId', function(value) {
-        if ($scope.state.selectedAgeGroupId) {
-          return fetchTeams();
         }
       });
       return $scope.$watch('state.dateOfBirth', function(value) {

@@ -125,10 +125,10 @@ module.controller 'SportilyRegistrationCtrl', [
         ##
         ## Fetch a list of all the teams for the current registration period.
         ##
-        fetchTeams = ->
-            filter = age_group_id: $scope.state.selectedAgeGroupId, organisation_id: $scope.state.selectedRegionId
+        fetchTeams = (ageGroupId, roles)->
+            filter = age_group_id: ageGroupId, organisation_id: $scope.state.selectedRegionId
             Teams.getList(filter).then (teams) ->
-                $scope.teams = teams.filter (t) ->
+                roles.teams = teams.filter (t) ->
                   t.competitions.data.length
 
 
@@ -181,7 +181,8 @@ module.controller 'SportilyRegistrationCtrl', [
         # initialise the scope with necessary data.
         fetchSeasons();
 
-#
+        $scope.getTeams = (role) ->
+          fetchTeams(role.selectedAgeGroupId, role)
 
         $scope.$watch 'state.selectedSeason', (value) ->
             if $scope.state.selectedSeason
@@ -189,9 +190,7 @@ module.controller 'SportilyRegistrationCtrl', [
               fetchOrganisation()
               fetchAgeGroups()
 
-        $scope.$watch 'state.selectedAgeGroupId', (value) ->
-            if $scope.state.selectedAgeGroupId
-              fetchTeams()
+
 
         # watch the date of birth for changes, and update the person model
         # ensuring that we support dates as Date objects (as provided by date
