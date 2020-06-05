@@ -1,6 +1,5 @@
 module = angular.module 'sportily.registration.controller', [
     'sportily.api'
-    'sportily.registration.types'
     'sportily.registration.forms'
 ]
 
@@ -17,21 +16,18 @@ module.controller 'SportilyRegistrationCtrl', [
     'Roles'
     'Seasons'
     'Teams'
-    'Types'
+    'RegistrationRoles'
     'Users'
 
-    ($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, Types, Users) ->
+    ($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users) ->
         $scope.user = {}
         $scope.person =
           marketing_opt_in:false
         $scope.roles = [ type: null ]
         $scope.complete = false
 
-        $scope.types = Types
-        $scope.typeOptions = _(Types)
-            .map (value, key) -> key: key, label: value.name, index: value.index
-            .sortBy 'index'
-            .value()
+        RegistrationRoles.getList({'organisation_id': $scope.organisationId}).then (roles) ->
+          $scope.typeOptions = roles
 
         $scope.state =
             agreement: false
@@ -39,6 +35,14 @@ module.controller 'SportilyRegistrationCtrl', [
             selectedSeason: null
             selectedRegionId: null
             selectedAgeGroupId: null
+
+        findRole = (type) ->
+           return _($scope.typeOptions).find (t) ->
+            return t.system_role == type
+
+        $scope.requiresTeam = (type) ->
+          role = findRole(type)
+          return role && role.requires_team
 
         ##
         ## Add a new, undefined, role to the scope.
@@ -58,8 +62,8 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Verify that at least one of the roles is valid.
         ##
         roleIsValid = (role) ->
-            rule = Types[role.type]
-            role.type && (!rule.requiresTeam || role.team_id)
+            rule = findRole(role.type)
+            role.type && (!rule.requires_team || role.team_id)
         verifyRoles = ->
             valid =  _.some $scope.roles, roleIsValid
             throw NO_VALID_ROLES_MESSAGE unless valid

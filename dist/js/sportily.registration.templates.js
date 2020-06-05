@@ -480,13 +480,13 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"type.key as type.label for type in typeOptions\"\n" +
+    "            ng-options=\"type.system_role as type.organisation_role for type in typeOptions\"\n" +
     "            ng-model=\"role.type\">\n" +
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
     "\n" +
-    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && types[role.type].requiresTeam\">\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && requiresTeam(role.type)\">\n" +
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"team.id as team.name for team in role.teams\"\n" +

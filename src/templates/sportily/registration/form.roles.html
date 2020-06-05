@@ -22,13 +22,13 @@
 
     <div class="form-group" ng-show="state.selectedRegionId">
         <select class="form-control"
-            ng-options="type.key as type.label for type in typeOptions"
+            ng-options="type.system_role as type.organisation_role for type in typeOptions"
             ng-model="role.type">
             <option value="">Role&hellip;</option>
         </select>
     </div>
 
-    <div class="form-group" ng-show="state.selectedRegionId && types[role.type].requiresTeam">
+    <div class="form-group" ng-show="state.selectedRegionId && requiresTeam(role.type)">
         <span>for</span>
         <select class="form-control"
             ng-options="team.id as team.name for team in role.teams"

@@ -8,13 +8,13 @@
 (function() {
   var NO_VALID_ROLES_MESSAGE, module;
 
-  module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.types', 'sportily.registration.forms']);
+  module = angular.module('sportily.registration.controller', ['sportily.api', 'sportily.registration.forms']);
 
   NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'Types', 'Users', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, Types, Users) {
-      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchSeasons, fetchTeams, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
+    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users) {
+      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchSeasons, fetchTeams, findRole, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
         marketing_opt_in: false
@@ -25,20 +25,27 @@
         }
       ];
       $scope.complete = false;
-      $scope.types = Types;
-      $scope.typeOptions = _(Types).map(function(value, key) {
-        return {
-          key: key,
-          label: value.name,
-          index: value.index
-        };
-      }).sortBy('index').value();
+      RegistrationRoles.getList({
+        'organisation_id': $scope.organisationId
+      }).then(function(roles) {
+        return $scope.typeOptions = roles;
+      });
       $scope.state = {
         agreement: false,
         dateOfBirth: '',
         selectedSeason: null,
         selectedRegionId: null,
         selectedAgeGroupId: null
+      };
+      findRole = function(type) {
+        return _($scope.typeOptions).find(function(t) {
+          return t.system_role === type;
+        });
+      };
+      $scope.requiresTeam = function(type) {
+        var role;
+        role = findRole(type);
+        return role && role.requires_team;
       };
       $scope.addRole = function() {
         return $scope.roles.push({
@@ -52,8 +59,8 @@
       };
       roleIsValid = function(role) {
         var rule;
-        rule = Types[role.type];
-        return role.type && (!rule.requiresTeam || role.team_id);
+        rule = findRole(role.type);
+        return role.type && (!rule.requires_team || role.team_id);
       };
       verifyRoles = function() {
         var valid;
@@ -530,68 +537,6 @@
         });
       }
     };
-  });
-
-}).call(this);
-
-(function() {
-  var module;
-
-  module = angular.module('sportily.registration.types', []);
-
-  module.constant('Types', {
-    player: {
-      index: 1,
-      name: 'Player',
-      requiresTeam: true
-    },
-    coach: {
-      index: 2,
-      name: 'Coach',
-      requiresTeam: true
-    },
-    manager: {
-      index: 3,
-      name: 'Manager',
-      requiresTeam: true
-    },
-    official: {
-      index: 4,
-      name: 'Non-Bench Official',
-      requiresTeam: true
-    },
-    committee: {
-      index: 5,
-      name: 'Regional Committee'
-    },
-    referee: {
-      index: 6,
-      name: 'Referee'
-    },
-    timekeeper: {
-      index: 7,
-      name: 'Timekeeper'
-    },
-    player_training: {
-      index: 8,
-      name: 'Player (Training)',
-      requiresTeam: true
-    },
-    player_recreational: {
-      index: 9,
-      name: 'Player (Recreational)',
-      requiresTeam: true
-    },
-    player_cross_registration: {
-      index: 10,
-      name: 'Player (Cross Registration)',
-      requiresTeam: true
-    },
-    parent: {
-      index: 11,
-      name: 'Parent',
-      requiresTeam: true
-    }
   });
 
 }).call(this);
@@ -1078,13 +1023,13 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"type.key as type.label for type in typeOptions\"\n" +
+    "            ng-options=\"type.system_role as type.organisation_role for type in typeOptions\"\n" +
     "            ng-model=\"role.type\">\n" +
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
     "\n" +
-    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && types[role.type].requiresTeam\">\n" +
+    "    <div class=\"form-group\" ng-show=\"state.selectedRegionId && requiresTeam(role.type)\">\n" +
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"team.id as team.name for team in role.teams\"\n" +
