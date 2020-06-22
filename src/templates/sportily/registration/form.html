@@ -38,7 +38,7 @@
         <p>{{ confirmationMessage }}</p>
         <p ng-if="message" class="alert alert-{{message.type}}">{{message.message}}</p>
         <p ng-if="member.financial_summary.owed.total"> Your member fees are: {{ member.financial_summary.owed.total | money }}
-        <p><payment-button email="user.email" member="member" message="message"></payment-button></p>
+        <p><payment-button email="user.email" member="member" message="message" organisation-id="organisationId"></payment-button></p>
     </div>
 
     <div ng-if="paid">

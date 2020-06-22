@@ -251,13 +251,12 @@
       nationalId = null;
       $scope.paymentsConfigured = false;
       if ($scope.member && $scope.member.financial_summary) {
-        nationalId = getNationalId($scope.member);
-        if (nationalId) {
-          return Organisations.one(nationalId).get().then(function(nationalOrganisation) {
-            $scope.nationalOrganisation = nationalOrganisation;
-            return $scope.paymentsConfigured = nationalOrganisation.stripe_user_id;
-          });
-        }
+        return Organisations.one($scope.organisationId).get({
+          include: 'payment_details'
+        }).then(function(paymentOrganisation) {
+          $scope.paymentOrganisation = paymentOrganisation;
+          return $scope.paymentsConfigured = paymentOrganisation.payment_details.stripe_user_id;
+        });
       }
     };
     return {
@@ -265,19 +264,20 @@
       scope: {
         member: '=',
         email: '=',
-        message: '='
+        message: '=',
+        organisationId: '='
       },
       template: '<button type="button" ng-if="paymentsConfigured && total > 0" ng-click="pay()" class="btn btn-primary">Pay Now</button>',
       controller: function($scope) {
         arePaymentsPossible($scope);
         $scope.total = getTotal($scope.member);
         return $scope.pay = function() {
-          return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.nationalOrganisation.name + ' League Registration Fees', $scope.nationalOrganisation).then(function(session) {
-            return PaymentService.take(session.id, $scope.member, $scope.amount).then(function() {
+          return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.paymentOrganisation.name + ' League Registration Fees', $scope.paymentOrganisation).then(function(session) {
+            return PaymentService.take(session.id, $scope.member, $scope.amount, $scope.paymentOrganisation).then(function() {
               return session;
             });
           }).then(function(session) {
-            return StripeService.redirectToPayment($scope.nationalOrganisation.stripe_user_id, session.id);
+            return StripeService.redirectToPayment($scope.paymentOrganisation.stripe_user_id, session.id);
           });
         };
       }
@@ -498,7 +498,7 @@
       return regions;
     };
     return {
-      take: function(stripeSessionId, member, amount) {
+      take: function(stripeSessionId, member, amount, paymentOrganisation) {
         var national, nationalPromise, promises, regions;
         national = getNational(member);
         regions = getRegionals(member);
@@ -510,25 +510,27 @@
             target_id: null,
             status: 'pending',
             organisation_id: region.id,
-            target_organisation_id: national.id,
+            target_organisation_id: paymentOrganisation.payment_details.id,
             method: "online"
           });
         });
-        nationalPromise = Transactions.post({
-          type: 'standard',
-          amount: national.total,
-          source_id: member.id,
-          target_id: null,
-          status: 'pending',
-          organisation_id: national.id,
-          target_organisation_id: national.id,
-          method: "online"
-        });
-        promises.push(nationalPromise);
+        if (national.total > 0) {
+          nationalPromise = Transactions.post({
+            type: 'standard',
+            amount: national.total,
+            source_id: member.id,
+            target_id: null,
+            status: 'pending',
+            organisation_id: national.id,
+            target_organisation_id: paymentOrganisation.payment_details.id,
+            method: "online"
+          });
+          promises.push(nationalPromise);
+        }
         return $q.all(promises).then(function(transactions) {
           return Payments.post({
             amount: member.financial_summary.owed.total,
-            organisation_id: national.id,
+            organisation_id: paymentOrganisation.payment_details.id,
             stripe_payment_token: stripeSessionId,
             transaction_ids: transactions.map(function(transaction) {
               return transaction.id;
@@ -665,7 +667,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <p>{{ confirmationMessage }}</p>\n" +
     "        <p ng-if=\"message\" class=\"alert alert-{{message.type}}\">{{message.message}}</p>\n" +
     "        <p ng-if=\"member.financial_summary.owed.total\"> Your member fees are: {{ member.financial_summary.owed.total | money }}\n" +
-    "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\"></payment-button></p>\n" +
+    "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\" organisation-id=\"organisationId\"></payment-button></p>\n" +
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"paid\">\n" +

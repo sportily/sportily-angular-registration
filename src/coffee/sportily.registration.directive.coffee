@@ -31,19 +31,17 @@ module.directive('paymentButton', ($q, StripeService, Organisations, PaymentServ
         nationalId = null
         $scope.paymentsConfigured = false;
         if ($scope.member && $scope.member.financial_summary)
-            nationalId = getNationalId($scope.member);
-            if (nationalId)
-                Organisations.one(nationalId).get().then((nationalOrganisation) ->
-                    $scope.nationalOrganisation = nationalOrganisation;
-                    $scope.paymentsConfigured = nationalOrganisation.stripe_user_id;
-                );
+            Organisations.one($scope.organisationId).get(include: 'payment_details').then (paymentOrganisation) ->
+              $scope.paymentOrganisation = paymentOrganisation;
+              return $scope.paymentsConfigured = paymentOrganisation.payment_details.stripe_user_id;
 
     return {
         restrict: 'E',
         scope: {
             member: '=',
             email: '=',
-            message: '='
+            message: '=',
+            organisationId: '='
         },
         template: '<button type="button" ng-if="paymentsConfigured && total > 0" ng-click="pay()" class="btn btn-primary">Pay Now</button>',
         controller: ($scope) ->
@@ -53,13 +51,13 @@ module.directive('paymentButton', ($q, StripeService, Organisations, PaymentServ
 
           $scope.pay = ->
 
-              return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.nationalOrganisation.name + ' League Registration Fees', $scope.nationalOrganisation
+              return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.paymentOrganisation.name + ' League Registration Fees', $scope.paymentOrganisation
               ).then((session) ->
-                  return PaymentService.take(session.id, $scope.member, $scope.amount).then(() ->
+                  return PaymentService.take(session.id, $scope.member, $scope.amount, $scope.paymentOrganisation).then(() ->
                       return session;
                   )
               ).then((session) ->
-                  return StripeService.redirectToPayment($scope.nationalOrganisation.stripe_user_id, session.id)
+                  return StripeService.redirectToPayment($scope.paymentOrganisation.stripe_user_id, session.id)
               )
 
       }

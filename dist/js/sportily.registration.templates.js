@@ -122,7 +122,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <p>{{ confirmationMessage }}</p>\n" +
     "        <p ng-if=\"message\" class=\"alert alert-{{message.type}}\">{{message.message}}</p>\n" +
     "        <p ng-if=\"member.financial_summary.owed.total\"> Your member fees are: {{ member.financial_summary.owed.total | money }}\n" +
-    "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\"></payment-button></p>\n" +
+    "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\" organisation-id=\"organisationId\"></payment-button></p>\n" +
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"paid\">\n" +

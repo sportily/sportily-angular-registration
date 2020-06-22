@@ -45,7 +45,7 @@ module.factory 'PaymentService', ($q, Transactions, Payments) ->
           return regions;
 
         return {
-            take: (stripeSessionId, member, amount) ->
+            take: (stripeSessionId, member, amount, paymentOrganisation) ->
               national = getNational(member);
               regions = getRegionals(member);
               promises = regions.map((region) ->
@@ -57,27 +57,29 @@ module.factory 'PaymentService', ($q, Transactions, Payments) ->
                       target_id: null,
                       status: 'pending',
                       organisation_id: region.id,
-                      target_organisation_id: national.id,
+                      target_organisation_id: paymentOrganisation.payment_details.id,
                       method: "online"
                   });
 
               );
-              nationalPromise = Transactions.post({
-                  type: 'standard',
-                  amount: national.total,
-                  source_id: member.id,
-                  target_id: null,
-                  status: 'pending',
-                  organisation_id: national.id,
-                  target_organisation_id: national.id,
-                  method: "online"
-              });
-              promises.push(nationalPromise);
+
+              if (national.total > 0)
+                nationalPromise = Transactions.post({
+                    type: 'standard',
+                    amount: national.total,
+                    source_id: member.id,
+                    target_id: null,
+                    status: 'pending',
+                    organisation_id: national.id,
+                    target_organisation_id: paymentOrganisation.payment_details.id,
+                    method: "online"
+                });
+                promises.push(nationalPromise);
 
               return $q.all(promises).then((transactions) ->
                   return Payments.post({
                     amount: member.financial_summary.owed.total,
-                    organisation_id: national.id,
+                    organisation_id: paymentOrganisation.payment_details.id,
                     stripe_payment_token: stripeSessionId,
                     transaction_ids: transactions.map((transaction) ->  return transaction.id; )
                   });
