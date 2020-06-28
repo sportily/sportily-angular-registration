@@ -14,7 +14,7 @@
 
   module.controller('SportilyRegistrationCtrl', [
     '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users) {
-      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchSeasons, fetchTeams, findRole, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
+      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
         marketing_opt_in: false
@@ -25,17 +25,29 @@
         }
       ];
       $scope.complete = false;
-      RegistrationRoles.getList({
-        'organisation_id': $scope.organisationId
-      }).then(function(roles) {
-        return $scope.typeOptions = roles;
-      });
+      fetchRoles = function() {
+        return RegistrationRoles.one('register').get({
+          'organisation_id': $scope.organisationId,
+          'email': $scope.user.email,
+          'season_id': $scope.state.selectedSeason
+        }).then(function(roles) {
+          return $scope.typeOptions = roles.data;
+        });
+      };
       $scope.state = {
         agreement: false,
         dateOfBirth: '',
         selectedSeason: null,
         selectedRegionId: null,
         selectedAgeGroupId: null
+      };
+      $scope.findUser = function() {
+        Users.getList({
+          email: $scope.user.email
+        }).then(function(response) {
+          return $scope.state.userExists = _.first(response).exists;
+        });
+        return fetchRoles();
       };
       findRole = function(type) {
         return _($scope.typeOptions).find(function(t) {

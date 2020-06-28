@@ -9,6 +9,19 @@
             <option value="">Season&hellip;</option>
         </select>
     </div>
+    <div ng-if="!complete && !paid && state.selectedSeason">
+
+    <field name="email" label="Email address">
+        <input type="email" class="form-control"
+            name="email"
+            ng-model="user.email"
+            required
+            autocomplete="off"
+            ng-blur="findUser()"
+            server-error>
+        <info>Email address will <em>never</em> be shown publicly.</info>
+    </field>
+  </div>
 
     <div ng-if="!complete && !paid && state.selectedSeason">
         <div ng-include="'templates/sportily/registration/form.personal.html'"></div>

@@ -39,16 +39,6 @@ angular.module("templates/sportily/registration/form.contact.html", []).run(["$t
     "<h3>Contact Details</h3>\n" +
     "\n" +
     "<!-- email address -->\n" +
-    "<field name=\"email\" label=\"Email address\">\n" +
-    "    <input type=\"email\" class=\"form-control\"\n" +
-    "        name=\"email\"\n" +
-    "        ng-model=\"user.email\"\n" +
-    "        required\n" +
-    "        autocomplete=\"off\"\n" +
-    "        server-error>\n" +
-    "    <info>Email address will <em>never</em> be shown publicly.</info>\n" +
-    "</field>\n" +
-    "\n" +
     "<field name=\"street_address\">\n" +
     "    <input type=\"text\" class=\"form-control\" name=\"street_address\" ng-model=\"person.street_address\">\n" +
     "</field>\n" +
@@ -93,6 +83,19 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "            <option value=\"\">Season&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +
+    "    <div ng-if=\"!complete && !paid && state.selectedSeason\">\n" +
+    "\n" +
+    "    <field name=\"email\" label=\"Email address\">\n" +
+    "        <input type=\"email\" class=\"form-control\"\n" +
+    "            name=\"email\"\n" +
+    "            ng-model=\"user.email\"\n" +
+    "            required\n" +
+    "            autocomplete=\"off\"\n" +
+    "            ng-blur=\"findUser()\"\n" +
+    "            server-error>\n" +
+    "        <info>Email address will <em>never</em> be shown publicly.</info>\n" +
+    "    </field>\n" +
+    "  </div>\n" +
     "\n" +
     "    <div ng-if=\"!complete && !paid && state.selectedSeason\">\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +

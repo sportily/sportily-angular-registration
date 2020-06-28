@@ -26,8 +26,13 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.roles = [ type: null ]
         $scope.complete = false
 
-        RegistrationRoles.getList({'organisation_id': $scope.organisationId}).then (roles) ->
-          $scope.typeOptions = roles
+        fetchRoles = () ->
+          RegistrationRoles.one('register').get({
+            'organisation_id': $scope.organisationId,
+            'email': $scope.user.email,
+            'season_id': $scope.state.selectedSeason
+            }).then (roles) ->
+            $scope.typeOptions = roles.data
 
         $scope.state =
             agreement: false
@@ -35,6 +40,11 @@ module.controller 'SportilyRegistrationCtrl', [
             selectedSeason: null
             selectedRegionId: null
             selectedAgeGroupId: null
+
+        $scope.findUser = ->
+          Users.getList({email: $scope.user.email}).then (response) ->
+            $scope.state.userExists = _.first(response).exists
+          fetchRoles()
 
         findRole = (type) ->
            return _($scope.typeOptions).find (t) ->
