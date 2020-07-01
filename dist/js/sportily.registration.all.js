@@ -31,7 +31,8 @@
           'email': $scope.user.email,
           'season_id': $scope.state.selectedSeason
         }).then(function(roles) {
-          return $scope.typeOptions = roles.data;
+          $scope.typeOptions = roles.data;
+          return $scope.requestedRoles = false;
         });
       };
       $scope.state = {
@@ -47,7 +48,8 @@
         }).then(function(response) {
           return $scope.state.userExists = _.first(response).exists;
         });
-        return fetchRoles();
+        fetchRoles();
+        return false;
       };
       findRole = function(type) {
         return _($scope.typeOptions).find(function(t) {
@@ -653,8 +655,9 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <info>Email address will <em>never</em> be shown publicly.</info>\n" +
     "    </field>\n" +
     "  </div>\n" +
+    "  <button ng-if=\"!typeOptions.length\" class=\"btn btn-default\" ng-click=\"findUser()\" formnovalidate>Next</button>\n" +
     "\n" +
-    "    <div ng-if=\"!complete && !paid && state.selectedSeason\">\n" +
+    "  <div ng-if=\"!complete && !paid && state.selectedSeason && typeOptions.length\">\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +

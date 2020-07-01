@@ -31,7 +31,8 @@
           'email': $scope.user.email,
           'season_id': $scope.state.selectedSeason
         }).then(function(roles) {
-          return $scope.typeOptions = roles.data;
+          $scope.typeOptions = roles.data;
+          return $scope.requestedRoles = false;
         });
       };
       $scope.state = {
@@ -47,7 +48,8 @@
         }).then(function(response) {
           return $scope.state.userExists = _.first(response).exists;
         });
-        return fetchRoles();
+        fetchRoles();
+        return false;
       };
       findRole = function(type) {
         return _($scope.typeOptions).find(function(t) {
