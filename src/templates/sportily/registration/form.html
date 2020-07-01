@@ -22,7 +22,7 @@
         <info>Email address will <em>never</em> be shown publicly.</info>
     </field>
   </div>
-  <button ng-if="!typeOptions.length" class="btn btn-default" ng-click="findUser()" formnovalidate>Next</button>
+  <button ng-disabled="!user.email" ng-if="!typeOptions.length" class="btn btn-default" ng-click="findUser()" formnovalidate>Next</button>
 
   <div ng-if="!complete && !paid && state.selectedSeason && typeOptions.length">
         <div ng-include="'templates/sportily/registration/form.personal.html'"></div>

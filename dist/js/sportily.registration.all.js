@@ -655,7 +655,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <info>Email address will <em>never</em> be shown publicly.</info>\n" +
     "    </field>\n" +
     "  </div>\n" +
-    "  <button ng-if=\"!typeOptions.length\" class=\"btn btn-default\" ng-click=\"findUser()\" formnovalidate>Next</button>\n" +
+    "  <button ng-disabled=\"!user.email\" ng-if=\"!typeOptions.length\" class=\"btn btn-default\" ng-click=\"findUser()\" formnovalidate>Next</button>\n" +
     "\n" +
     "  <div ng-if=\"!complete && !paid && state.selectedSeason && typeOptions.length\">\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
