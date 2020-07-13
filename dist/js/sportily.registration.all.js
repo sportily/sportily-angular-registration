@@ -52,7 +52,7 @@
         return false;
       };
       findRole = function(type) {
-        return _($scope.typeOptions).find(function(t) {
+        return _($scope.typeOptions[$scope.state.selectedRegionId].data).find(function(t) {
           return t.system_role === type;
         });
       };

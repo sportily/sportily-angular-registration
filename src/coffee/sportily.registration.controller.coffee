@@ -49,7 +49,7 @@ module.controller 'SportilyRegistrationCtrl', [
           return false
 
         findRole = (type) ->
-           return _($scope.typeOptions).find (t) ->
+           return _($scope.typeOptions[$scope.state.selectedRegionId].data).find (t) ->
             return t.system_role == type
 
         $scope.requiresTeam = (type) ->
