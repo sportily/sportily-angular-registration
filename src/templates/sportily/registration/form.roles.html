@@ -22,7 +22,7 @@
 
     <div class="form-group" ng-show="state.selectedRegionId">
         <select class="form-control"
-            ng-options="type.system_role as type.organisation_role for type in typeOptions"
+            ng-options="type.system_role as type.organisation_role for type in typeOptions[state.selectedRegionId].data"
             ng-model="role.type">
             <option value="">Role&hellip;</option>
         </select>

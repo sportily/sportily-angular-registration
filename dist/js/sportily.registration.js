@@ -31,7 +31,7 @@
           'email': $scope.user.email,
           'season_id': $scope.state.selectedSeason
         }).then(function(roles) {
-          $scope.typeOptions = roles.data;
+          $scope.typeOptions = roles;
           return $scope.requestedRoles = false;
         });
       };

@@ -32,7 +32,7 @@ module.controller 'SportilyRegistrationCtrl', [
               'email': $scope.user.email,
               'season_id': $scope.state.selectedSeason
               }).then (roles) ->
-                $scope.typeOptions = roles.data
+                $scope.typeOptions = roles
                 $scope.requestedRoles = false
 
         $scope.state =

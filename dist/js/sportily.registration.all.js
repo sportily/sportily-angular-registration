@@ -31,7 +31,7 @@
           'email': $scope.user.email,
           'season_id': $scope.state.selectedSeason
         }).then(function(roles) {
-          $scope.typeOptions = roles.data;
+          $scope.typeOptions = roles;
           return $scope.requestedRoles = false;
         });
       };
@@ -655,9 +655,9 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <info>Email address will <em>never</em> be shown publicly.</info>\n" +
     "    </field>\n" +
     "  </div>\n" +
-    "  <button ng-disabled=\"!user.email\" ng-if=\"!typeOptions.length\" class=\"btn btn-default\" ng-click=\"findUser()\" formnovalidate>Next</button>\n" +
+    "  <button ng-disabled=\"!user.email\" ng-if=\"!typeOptions\" class=\"btn btn-default\" ng-click=\"findUser()\" formnovalidate>Next</button>\n" +
     "\n" +
-    "  <div ng-if=\"!complete && !paid && state.selectedSeason && typeOptions.length\">\n" +
+    "  <div ng-if=\"!complete && !paid && state.selectedSeason && typeOptions\">\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.personal.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.roles.html'\"></div>\n" +
     "        <div ng-include=\"'templates/sportily/registration/form.contact.html'\"></div>\n" +
@@ -1043,7 +1043,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"type.system_role as type.organisation_role for type in typeOptions\"\n" +
+    "            ng-options=\"type.system_role as type.organisation_role for type in typeOptions[state.selectedRegionId].data\"\n" +
     "            ng-model=\"role.type\">\n" +
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +
