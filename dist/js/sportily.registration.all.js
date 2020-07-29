@@ -265,7 +265,7 @@
       nationalId = null;
       $scope.paymentsConfigured = false;
       if ($scope.member && $scope.member.financial_summary) {
-        return Organisations.one($scope.organisationId).get({
+        return Organisations.one($scope.selectedRegionId).get({
           include: 'payment_details'
         }).then(function(paymentOrganisation) {
           $scope.paymentOrganisation = paymentOrganisation;
@@ -279,7 +279,8 @@
         member: '=',
         email: '=',
         message: '=',
-        organisationId: '='
+        organisationId: '=',
+        selectedRegionId: '='
       },
       template: '<button type="button" ng-if="paymentsConfigured && total > 0" ng-click="pay()" class="btn btn-primary">Pay Now</button>',
       controller: function($scope) {
@@ -685,7 +686,7 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "        <p>{{ confirmationMessage }}</p>\n" +
     "        <p ng-if=\"message\" class=\"alert alert-{{message.type}}\">{{message.message}}</p>\n" +
     "        <p ng-if=\"member.financial_summary.owed.total\"> Your member fees are: {{ member.financial_summary.owed.total | money }}\n" +
-    "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\" organisation-id=\"organisationId\"></payment-button></p>\n" +
+    "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\" organisation-id=\"organisationId\" selected-region-id=\"state.selectedRegionId\"></payment-button></p>\n" +
     "    </div>\n" +
     "\n" +
     "    <div ng-if=\"paid\">\n" +
@@ -1025,7 +1026,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <label>Role #{{ $index + 1 }}:</label>\n" +
     "\n" +
-    "    <div class=\"form-group\">\n" +
+    "    <div class=\"form-group\" ng-if=\"$index == 0\">\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"r.id as r.name for r in regions\"\n" +
     "            ng-model=\"state.selectedRegionId\">\n" +

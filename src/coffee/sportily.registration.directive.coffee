@@ -31,7 +31,7 @@ module.directive('paymentButton', ($q, StripeService, Organisations, PaymentServ
         nationalId = null
         $scope.paymentsConfigured = false;
         if ($scope.member && $scope.member.financial_summary)
-            Organisations.one($scope.organisationId).get(include: 'payment_details').then (paymentOrganisation) ->
+            Organisations.one($scope.selectedRegionId).get(include: 'payment_details').then (paymentOrganisation) ->
               $scope.paymentOrganisation = paymentOrganisation;
               return $scope.paymentsConfigured = paymentOrganisation.payment_details.stripe_user_id;
 
@@ -41,7 +41,8 @@ module.directive('paymentButton', ($q, StripeService, Organisations, PaymentServ
             member: '=',
             email: '=',
             message: '=',
-            organisationId: '='
+            organisationId: '=',
+            selectedRegionId  : '='
         },
         template: '<button type="button" ng-if="paymentsConfigured && total > 0" ng-click="pay()" class="btn btn-primary">Pay Now</button>',
         controller: ($scope) ->

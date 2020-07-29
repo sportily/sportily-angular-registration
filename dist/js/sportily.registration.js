@@ -265,7 +265,7 @@
       nationalId = null;
       $scope.paymentsConfigured = false;
       if ($scope.member && $scope.member.financial_summary) {
-        return Organisations.one($scope.organisationId).get({
+        return Organisations.one($scope.selectedRegionId).get({
           include: 'payment_details'
         }).then(function(paymentOrganisation) {
           $scope.paymentOrganisation = paymentOrganisation;
@@ -279,7 +279,8 @@
         member: '=',
         email: '=',
         message: '=',
-        organisationId: '='
+        organisationId: '=',
+        selectedRegionId: '='
       },
       template: '<button type="button" ng-if="paymentsConfigured && total > 0" ng-click="pay()" class="btn btn-primary">Pay Now</button>',
       controller: function($scope) {
