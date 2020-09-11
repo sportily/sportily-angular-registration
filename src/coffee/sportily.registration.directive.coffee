@@ -52,13 +52,13 @@ module.directive('paymentButton', ($q, StripeService, Organisations, PaymentServ
 
           $scope.pay = ->
 
-              return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.paymentOrganisation.name + ' League Registration Fees', $scope.paymentOrganisation
+              return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.paymentOrganisation.name + ' League Registration Fees', $scope.paymentOrganisation.payment_details
               ).then((session) ->
                   return PaymentService.take(session.id, $scope.member, $scope.amount, $scope.paymentOrganisation).then(() ->
                       return session;
                   )
               ).then((session) ->
-                  return StripeService.redirectToPayment($scope.paymentOrganisation.stripe_user_id, session.id)
+                  return StripeService.redirectToPayment($scope.paymentOrganisation.payment_details.stripe_user_id, session.id)
               )
 
       }

@@ -287,12 +287,12 @@
         arePaymentsPossible($scope);
         $scope.total = getTotal($scope.member);
         return $scope.pay = function() {
-          return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.paymentOrganisation.name + ' League Registration Fees', $scope.paymentOrganisation).then(function(session) {
+          return StripeService.getSession($scope.total, $scope.email, "Sportily League Fees", $scope.paymentOrganisation.name + ' League Registration Fees', $scope.paymentOrganisation.payment_details).then(function(session) {
             return PaymentService.take(session.id, $scope.member, $scope.amount, $scope.paymentOrganisation).then(function() {
               return session;
             });
           }).then(function(session) {
-            return StripeService.redirectToPayment($scope.paymentOrganisation.stripe_user_id, session.id);
+            return StripeService.redirectToPayment($scope.paymentOrganisation.payment_details.stripe_user_id, session.id);
           });
         };
       }
