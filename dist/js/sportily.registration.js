@@ -13,7 +13,7 @@
   NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users) {
+    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields) {
       var fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
@@ -114,7 +114,9 @@
         });
       };
       fetchMember = function() {
-        return Members.one($scope.member_id).get();
+        return Members.one($scope.member_id).get({
+          'includes': 'customRegistrationFields'
+        });
       };
       fetchOrganisation = function() {
         return Organisations.one($scope.organisationId).get({
@@ -131,8 +133,15 @@
             name: organisation.name
           });
           if (!organisation.regions.data.length) {
-            return $scope.state.selectedRegionId = organisation.id;
+            $scope.state.selectedRegionId = organisation.id;
           }
+          return CustomRegistrationFields.getList({
+            'organisation_id': organisation.id,
+            'parent_organisation_id': organisation.parent_id,
+            'show_on_registration_form': 1
+          }).then(function(fields) {
+            return $scope.customRegistrationFields = fields;
+          });
         });
       };
       fetchAgeGroups = function() {
@@ -191,12 +200,34 @@
       $scope.$watch('state.selectedSeason', function(value) {
         if ($scope.state.selectedSeason) {
           $scope.member = {
-            season_id: $scope.state.selectedSeason
+            season_id: $scope.state.selectedSeason,
+            customRegistrationFields: {
+              data: []
+            }
           };
           fetchOrganisation();
           return fetchAgeGroups();
         }
       });
+      $scope.findCustomField = function(field) {
+        var f;
+        f = _.find($scope.member.customRegistrationFields.data, function(c) {
+          return c.custom_registration_field_id === field.id;
+        });
+        if (f && field.type === 'date') {
+          moment(f.answer, 'DD/MM/YYYY', true).toDate();
+        }
+        if (f) {
+          return f;
+        }
+        f = {
+          custom_registration_field_id: field.id,
+          answer: "",
+          member_id: $scope.member.id
+        };
+        $scope.member.customRegistrationFields.data.push(f);
+        return f;
+      };
       return $scope.$watch('state.dateOfBirth', function(value) {
         var dob, input, output;
         input = 'DD/MM/YYYY';

@@ -17,9 +17,10 @@ module.controller 'SportilyRegistrationCtrl', [
     'Seasons'
     'Teams'
     'RegistrationRoles'
-    'Users'
+    'Users',
+    'CustomRegistrationFields'
 
-    ($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users) ->
+    ($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields) ->
         $scope.user = {}
         $scope.person =
           marketing_opt_in:false
@@ -114,7 +115,7 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Fetch a list of all the age groups for the current season.
         ##
         fetchMember = ->
-            Members.one($scope.member_id).get()
+            Members.one($scope.member_id).get({'includes': 'customRegistrationFields'})
 
         ##
         ## Fetch a list of all the organisations for the current registration
@@ -127,6 +128,12 @@ module.controller 'SportilyRegistrationCtrl', [
                 $scope.regions.unshift id: organisation.id, name: organisation.name
 
                 $scope.state.selectedRegionId = organisation.id if !organisation.regions.data.length
+                CustomRegistrationFields.getList({
+                    'organisation_id': organisation.id,
+                    'parent_organisation_id': organisation.parent_id,
+                    'show_on_registration_form': 1
+                }).then (fields) ->
+                    $scope.customRegistrationFields = fields
 
 
         ##
@@ -202,11 +209,20 @@ module.controller 'SportilyRegistrationCtrl', [
 
         $scope.$watch 'state.selectedSeason', (value) ->
             if $scope.state.selectedSeason
-              $scope.member = season_id: $scope.state.selectedSeason
+              $scope.member = season_id: $scope.state.selectedSeason, customRegistrationFields: data: []
               fetchOrganisation()
               fetchAgeGroups()
 
 
+        $scope.findCustomField = (field) ->
+            f = _.find $scope.member.customRegistrationFields.data, (c) ->
+                c.custom_registration_field_id == field.id
+            
+            moment(f.answer, 'DD/MM/YYYY', true).toDate() if f && field.type == 'date'
+            return f if f
+            f = custom_registration_field_id: field.id, answer: "", member_id: $scope.member.id
+            $scope.member.customRegistrationFields.data.push f
+            return f
 
         # watch the date of birth for changes, and update the person model
         # ensuring that we support dates as Date objects (as provided by date

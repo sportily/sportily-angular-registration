@@ -313,3 +313,20 @@
         </select>
     </div>
 </field>
+
+<field ng-repeat="field in customRegistrationFields" name="dbs number" label="{{:: field.question}}">
+	<div ng-if="field.type == 'dropdown'" class="form-inline">
+        <select ng-model="findCustomField(field).answer" class="form-control">
+            <option ng-repeat="option in field.options_list" value="{{option}}">{{option}}</option>
+        </select>
+    </div>
+    <input ng-if="field.type == 'text'" type="text" class="form-control" ng-model="findCustomField(field).answer">
+
+    <div ng-if="field.type == 'date'" class="form-inline">
+		<input type="text" class="form-control"
+        	ng-model="findCustomField(field).answer"
+        	placeholder="dd/mm/yyyy"
+        	/>
+  
+    </div>
+</field>

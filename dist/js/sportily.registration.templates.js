@@ -455,6 +455,23 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        </select>\n" +
     "    </div>\n" +
     "</field>\n" +
+    "\n" +
+    "<field ng-repeat=\"field in customRegistrationFields\" name=\"dbs number\" label=\"{{:: field.question}}\">\n" +
+    "	<div ng-if=\"field.type == 'dropdown'\" class=\"form-inline\">\n" +
+    "        <select ng-model=\"findCustomField(field).answer\" class=\"form-control\">\n" +
+    "            <option ng-repeat=\"option in field.options_list\" value=\"{{option}}\">{{option}}</option>\n" +
+    "        </select>\n" +
+    "    </div>\n" +
+    "    <input ng-if=\"field.type == 'text'\" type=\"text\" class=\"form-control\" ng-model=\"findCustomField(field).answer\">\n" +
+    "\n" +
+    "    <div ng-if=\"field.type == 'date'\" class=\"form-inline\">\n" +
+    "		<input type=\"text\" class=\"form-control\"\n" +
+    "        	ng-model=\"findCustomField(field).answer\"\n" +
+    "        	placeholder=\"dd/mm/yyyy\"\n" +
+    "        	/>\n" +
+    "  \n" +
+    "    </div>\n" +
+    "</field>\n" +
     "");
 }]);
 
