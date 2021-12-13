@@ -18,9 +18,9 @@ module.controller 'SportilyRegistrationCtrl', [
     'Teams'
     'RegistrationRoles'
     'Users',
-    'CustomRegistrationFields'
-
-    ($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields) ->
+    'CustomRegistrationFields',
+    'SportilyApi'
+    ($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) ->
         $scope.user = {}
         $scope.person =
           marketing_opt_in:false
@@ -46,6 +46,7 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.findUser = ->
           Users.getList({email: $scope.user.email}).then (response) ->
             $scope.state.userExists = _.first(response).exists
+            $scope.user.id = _.first(response).id
           fetchRoles()
           return false
 
@@ -88,12 +89,8 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.save = ->
             $scope.saving = true
             Form.isValid($scope)
-                .then verifyRoles
-                .then saveUser
-                .then savePerson
-                .then saveMember
-                .then saveRoles
-                .then fetchMember
+                .then(verifyRoles)
+                .then saveAll
                 .then (member) ->
                   $scope.member = member
                   $scope.complete = true
@@ -103,9 +100,9 @@ module.controller 'SportilyRegistrationCtrl', [
                   $scope.saving = false
                   window.parent.postMessage('scroll_top', '*')
                   window.scrollTo(0,0);
-                .catch () ->
+                .catch (response) ->
                   $scope.saving = false
-                  Form.showErrors($scope)
+                  (Form.showErrors($scope))(response)
 
         fetchSeasons = ->
           Seasons.getList({'organisation_id': $scope.organisationId}).then (seasons) ->
@@ -126,7 +123,7 @@ module.controller 'SportilyRegistrationCtrl', [
                 $scope.regions = organisation.regions.data.map (r) ->
                   id: r.id, name: r.name
                 $scope.regions.unshift id: organisation.id, name: organisation.name
-
+                $scope.activeCompetitionId = organisation.active_competition_id
                 $scope.state.selectedRegionId = organisation.id if !organisation.regions.data.length
                 CustomRegistrationFields.getList({
                     'organisation_id': organisation.id,
@@ -154,6 +151,20 @@ module.controller 'SportilyRegistrationCtrl', [
                 roles.teams = teams.filter (t) ->
                   t.competitions.data.length
 
+        ##
+        ## Post all data at once
+        saveAll = ->
+            roles = $scope.roles.map (r) ->
+                rule = findRole(r.type)
+                r.competition_id = $scope.activeCompetitionId if rule && !rule.requires_team
+                r
+
+            data = 
+                user: $scope.user,
+                person: $scope.person,
+                member: $scope.member,
+                roles: roles
+            SportilyApi.all('members').customPOST(data,'register')
 
         ##
         ## Save the user defined in the scope, or – if no user is defined in

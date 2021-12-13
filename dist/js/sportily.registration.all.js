@@ -13,8 +13,8 @@
   NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields) {
-      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
+    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', 'SportilyApi', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) {
+      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveAll, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
         marketing_opt_in: false
@@ -46,7 +46,8 @@
         Users.getList({
           email: $scope.user.email
         }).then(function(response) {
-          return $scope.state.userExists = _.first(response).exists;
+          $scope.state.userExists = _.first(response).exists;
+          return $scope.user.id = _.first(response).id;
         });
         fetchRoles();
         return false;
@@ -85,7 +86,7 @@
       };
       $scope.save = function() {
         $scope.saving = true;
-        return Form.isValid($scope).then(verifyRoles).then(saveUser).then(savePerson).then(saveMember).then(saveRoles).then(fetchMember).then(function(member) {
+        return Form.isValid($scope).then(verifyRoles).then(saveAll).then(function(member) {
           var season;
           $scope.member = member;
           $scope.complete = true;
@@ -99,9 +100,9 @@
           $scope.saving = false;
           window.parent.postMessage('scroll_top', '*');
           return window.scrollTo(0, 0);
-        })["catch"](function() {
+        })["catch"](function(response) {
           $scope.saving = false;
-          return Form.showErrors($scope);
+          return (Form.showErrors($scope))(response);
         });
       };
       fetchSeasons = function() {
@@ -132,6 +133,7 @@
             id: organisation.id,
             name: organisation.name
           });
+          $scope.activeCompetitionId = organisation.active_competition_id;
           if (!organisation.regions.data.length) {
             $scope.state.selectedRegionId = organisation.id;
           }
@@ -164,6 +166,24 @@
             return t.competitions.data.length;
           });
         });
+      };
+      saveAll = function() {
+        var data, roles;
+        roles = $scope.roles.map(function(r) {
+          var rule;
+          rule = findRole(r.type);
+          if (rule && !rule.requires_team) {
+            r.competition_id = $scope.activeCompetitionId;
+          }
+          return r;
+        });
+        data = {
+          user: $scope.user,
+          person: $scope.person,
+          member: $scope.member,
+          roles: roles
+        };
+        return SportilyApi.all('members').customPOST(data, 'register');
       };
       saveUser = function() {
         if ($scope.user.email) {
