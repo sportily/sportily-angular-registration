@@ -736,7 +736,8 @@ angular.module("templates/sportily/registration/form.html", []).run(["$templateC
     "    <div ng-if=\"complete && !paid\">\n" +
     "        <p>{{ confirmationMessage }}</p>\n" +
     "        <p ng-if=\"message\" class=\"alert alert-{{message.type}}\">{{message.message}}</p>\n" +
-    "        <p ng-if=\"member.financial_summary.owed.total\"> Your member fees are: {{ member.financial_summary.owed.total | money }}\n" +
+    "        <p ng-if=\"organisationId == 9\" class=\"alert alert-error alert-larger\">Your registration is not complete until you have paid. Your registration and subsequent membership profile will be automatically deleted if you haven't paid. Please select 'Continue' to go to the payment page.</p>\n" +
+    "        <p ng-if=\"member.financial_summary.owed.total\"> Your member fees are: {{ member.financial_summary.owed.total | money }}</p>\n" +
     "        <p><payment-button email=\"user.email\" member=\"member\" message=\"message\" organisation-id=\"organisationId\" selected-region-id=\"state.selectedRegionId\"></payment-button></p>\n" +
     "    </div>\n" +
     "\n" +
