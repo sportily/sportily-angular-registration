@@ -199,7 +199,15 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        server-error>\n" +
     "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
     "</field>\n" +
-    "\n" +
+    "<div ng-if=\"dbsSettings.value.org_id\">\n" +
+    "	<field name=\"dbs_apply\" label=\"Apply for DBS registration.\">\n" +
+    "		<input type=\"checkbox\" class=\"form-control\"\n" +
+    "			name=\"dbs_apply\"\n" +
+    "			ng-model=\"person.dbs_apply\"\n" +
+    "			server-error>\n" +
+    "		<info ng-if=\"dbsSettings.value.application_fee > 0\">An additional charge of £{{dbsSettings.value.application_fee / 100}} will apply.</info>\n" +
+    "	</field>\n" +
+    "</div>\n" +
     "<!-- passport nationality -->\n" +
     "<field name=\"passport_nationality\" label=\"Passport Nationality\">\n" +
     "    <div class=\"form-inline\">\n" +

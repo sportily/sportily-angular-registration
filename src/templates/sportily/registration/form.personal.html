@@ -56,7 +56,17 @@
         server-error>
     <info>A valid DBS registration is required for all officials aged 16 year or older.</info>
 </field>
-
+{{dbsSettings}}
+<div ng-if="dbsSettings.value.org_id">
+	<field name="dbs_apply" label="Apply for DBS registration.">
+		<input type="checkbox" class="form-control"
+			name="dbs_apply"
+			ng-model="person.dbs_apply"
+			server-error>
+		<info ng-if="dbsSettings.value.application_fee > 0">An additional charge of £{{dbsSettings.value.application_fee / 100}} will apply.</info>
+		<info>You will recieve an email from Disclosure Services to complete the application.</info>
+	</field>
+</div>
 <!-- passport nationality -->
 <field name="passport_nationality" label="Passport Nationality">
     <div class="form-inline">

@@ -13,7 +13,7 @@
   NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', 'SportilyApi', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) {
+    '$scope', '$q', 'Settings', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', 'SportilyApi', function($scope, $q, Settings, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) {
       var fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveAll, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
@@ -25,6 +25,7 @@
         }
       ];
       $scope.complete = false;
+      $scope.dbsApplicationEnabled = false;
       fetchRoles = function() {
         return RegistrationRoles.one('register').get({
           'organisation_id': $scope.organisationId,
@@ -214,6 +215,14 @@
         })(this), $q.resolve());
       };
       fetchSeasons();
+      Settings.getList({
+        organisation_id: $scope.organisationId,
+        name: 'dbs'
+      }).then(function(s) {
+        if (s.length > 0) {
+          return $scope.dbsSettings = s[0];
+        }
+      });
       $scope.getTeams = function(role) {
         return fetchTeams(role.selectedAgeGroupId, role);
       };

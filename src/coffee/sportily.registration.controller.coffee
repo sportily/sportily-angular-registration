@@ -8,6 +8,7 @@ NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.'
 module.controller 'SportilyRegistrationCtrl', [
     '$scope'
     '$q'
+    'Settings'
     'Form'
     'AgeGroups'
     'Organisations'
@@ -20,13 +21,13 @@ module.controller 'SportilyRegistrationCtrl', [
     'Users',
     'CustomRegistrationFields',
     'SportilyApi'
-    ($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) ->
+    ($scope, $q, Settings, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) ->
         $scope.user = {}
         $scope.person =
           marketing_opt_in:false
         $scope.roles = [ type: null ]
         $scope.complete = false
-
+        $scope.dbsApplicationEnabled = false
         fetchRoles = () ->
             RegistrationRoles.one('register').get({
               'organisation_id': $scope.organisationId,
@@ -214,6 +215,10 @@ module.controller 'SportilyRegistrationCtrl', [
 
         # initialise the scope with necessary data.
         fetchSeasons();
+
+        Settings.getList( organisation_id: $scope.organisationId, name: 'dbs' ).then (s) ->
+            if s.length > 0
+                $scope.dbsSettings = s[0]
 
         $scope.getTeams = (role) ->
           fetchTeams(role.selectedAgeGroupId, role)

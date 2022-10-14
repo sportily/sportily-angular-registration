@@ -13,7 +13,7 @@
   NO_VALID_ROLES_MESSAGE = 'Please select at least one valid role.';
 
   module.controller('SportilyRegistrationCtrl', [
-    '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', 'SportilyApi', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) {
+    '$scope', '$q', 'Settings', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', 'SportilyApi', function($scope, $q, Settings, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) {
       var fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveAll, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
@@ -25,6 +25,7 @@
         }
       ];
       $scope.complete = false;
+      $scope.dbsApplicationEnabled = false;
       fetchRoles = function() {
         return RegistrationRoles.one('register').get({
           'organisation_id': $scope.organisationId,
@@ -214,6 +215,14 @@
         })(this), $q.resolve());
       };
       fetchSeasons();
+      Settings.getList({
+        organisation_id: $scope.organisationId,
+        name: 'dbs'
+      }).then(function(s) {
+        if (s.length > 0) {
+          return $scope.dbsSettings = s[0];
+        }
+      });
       $scope.getTeams = function(role) {
         return fetchTeams(role.selectedAgeGroupId, role);
       };
@@ -810,7 +819,15 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        server-error>\n" +
     "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
     "</field>\n" +
-    "\n" +
+    "<div ng-if=\"dbsSettings.value.org_id\">\n" +
+    "	<field name=\"dbs_apply\" label=\"Apply for DBS registration.\">\n" +
+    "		<input type=\"checkbox\" class=\"form-control\"\n" +
+    "			name=\"dbs_apply\"\n" +
+    "			ng-model=\"person.dbs_apply\"\n" +
+    "			server-error>\n" +
+    "		<info ng-if=\"dbsSettings.value.application_fee > 0\">An additional charge of £{{dbsSettings.value.application_fee / 100}} will apply.</info>\n" +
+    "	</field>\n" +
+    "</div>\n" +
     "<!-- passport nationality -->\n" +
     "<field name=\"passport_nationality\" label=\"Passport Nationality\">\n" +
     "    <div class=\"form-inline\">\n" +
