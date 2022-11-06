@@ -28,7 +28,7 @@
       $scope.dbsApplicationEnabled = false;
       fetchRoles = function() {
         return RegistrationRoles.one('register').get({
-          'organisation_id': $scope.organisationId,
+          'parent_organisation_id': $scope.organisationId,
           'email': $scope.user.email,
           'season_id': $scope.state.selectedSeason
         }).then(function(roles) {

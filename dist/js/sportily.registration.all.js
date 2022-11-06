@@ -28,7 +28,7 @@
       $scope.dbsApplicationEnabled = false;
       fetchRoles = function() {
         return RegistrationRoles.one('register').get({
-          'organisation_id': $scope.organisationId,
+          'parent_organisation_id': $scope.organisationId,
           'email': $scope.user.email,
           'season_id': $scope.state.selectedSeason
         }).then(function(roles) {
@@ -819,6 +819,7 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        server-error>\n" +
     "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
     "</field>\n" +
+    "{{dbsSettings}}\n" +
     "<div ng-if=\"dbsSettings.value.org_id\">\n" +
     "	<field name=\"dbs_apply\" label=\"Apply for DBS registration.\">\n" +
     "		<input type=\"checkbox\" class=\"form-control\"\n" +
@@ -826,6 +827,7 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "			ng-model=\"person.dbs_apply\"\n" +
     "			server-error>\n" +
     "		<info ng-if=\"dbsSettings.value.application_fee > 0\">An additional charge of £{{dbsSettings.value.application_fee / 100}} will apply.</info>\n" +
+    "		<info>You will recieve an email from Disclosure Services to complete the application.</info>\n" +
     "	</field>\n" +
     "</div>\n" +
     "<!-- passport nationality -->\n" +
