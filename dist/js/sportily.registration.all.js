@@ -138,13 +138,32 @@
           if (!organisation.regions.data.length) {
             $scope.state.selectedRegionId = organisation.id;
           }
-          return CustomRegistrationFields.getList({
+          CustomRegistrationFields.getList({
             'organisation_id': organisation.id,
             'parent_organisation_id': organisation.parent_id,
             'show_on_registration_form': 1
           }).then(function(fields) {
             return $scope.customRegistrationFields = fields;
           });
+          if (organisation.parent_id) {
+            return Settings.getList({
+              organisation_id: organisation.parent_id,
+              name: 'dbs'
+            }).then(function(s) {
+              if (s.length > 0) {
+                return $scope.dbsSettings = s[0];
+              }
+            });
+          } else {
+            return Settings.getList({
+              organisation_id: organisation.id,
+              name: 'dbs'
+            }).then(function(s) {
+              if (s.length > 0) {
+                return $scope.dbsSettings = s[0];
+              }
+            });
+          }
         });
       };
       fetchAgeGroups = function() {
@@ -215,14 +234,6 @@
         })(this), $q.resolve());
       };
       fetchSeasons();
-      Settings.getList({
-        organisation_id: $scope.organisationId,
-        name: 'dbs'
-      }).then(function(s) {
-        if (s.length > 0) {
-          return $scope.dbsSettings = s[0];
-        }
-      });
       $scope.getTeams = function(role) {
         return fetchTeams(role.selectedAgeGroupId, role);
       };
@@ -819,7 +830,6 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        server-error>\n" +
     "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
     "</field>\n" +
-    "{{dbsSettings}}\n" +
     "<div ng-if=\"dbsSettings.value.org_id\">\n" +
     "	<field name=\"dbs_apply\" label=\"Apply for DBS registration.\">\n" +
     "		<input type=\"checkbox\" class=\"form-control\"\n" +

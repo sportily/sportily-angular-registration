@@ -138,13 +138,32 @@
           if (!organisation.regions.data.length) {
             $scope.state.selectedRegionId = organisation.id;
           }
-          return CustomRegistrationFields.getList({
+          CustomRegistrationFields.getList({
             'organisation_id': organisation.id,
             'parent_organisation_id': organisation.parent_id,
             'show_on_registration_form': 1
           }).then(function(fields) {
             return $scope.customRegistrationFields = fields;
           });
+          if (organisation.parent_id) {
+            return Settings.getList({
+              organisation_id: organisation.parent_id,
+              name: 'dbs'
+            }).then(function(s) {
+              if (s.length > 0) {
+                return $scope.dbsSettings = s[0];
+              }
+            });
+          } else {
+            return Settings.getList({
+              organisation_id: organisation.id,
+              name: 'dbs'
+            }).then(function(s) {
+              if (s.length > 0) {
+                return $scope.dbsSettings = s[0];
+              }
+            });
+          }
         });
       };
       fetchAgeGroups = function() {
@@ -215,14 +234,6 @@
         })(this), $q.resolve());
       };
       fetchSeasons();
-      Settings.getList({
-        organisation_id: $scope.organisationId,
-        name: 'dbs'
-      }).then(function(s) {
-        if (s.length > 0) {
-          return $scope.dbsSettings = s[0];
-        }
-      });
       $scope.getTeams = function(role) {
         return fetchTeams(role.selectedAgeGroupId, role);
       };

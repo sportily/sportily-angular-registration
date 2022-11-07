@@ -199,7 +199,6 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "        server-error>\n" +
     "    <info>A valid DBS registration is required for all officials aged 16 year or older.</info>\n" +
     "</field>\n" +
-    "{{dbsSettings}}\n" +
     "<div ng-if=\"dbsSettings.value.org_id\">\n" +
     "	<field name=\"dbs_apply\" label=\"Apply for DBS registration.\">\n" +
     "		<input type=\"checkbox\" class=\"form-control\"\n" +

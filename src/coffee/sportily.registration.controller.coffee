@@ -133,6 +133,15 @@ module.controller 'SportilyRegistrationCtrl', [
                 }).then (fields) ->
                     $scope.customRegistrationFields = fields
 
+                if organisation.parent_id
+                    Settings.getList( organisation_id: organisation.parent_id, name: 'dbs' ).then (s) ->
+                        if s.length > 0
+                            $scope.dbsSettings = s[0]
+                else
+                    Settings.getList( organisation_id: organisation.id, name: 'dbs' ).then (s) ->
+                        if s.length > 0
+                            $scope.dbsSettings = s[0]
+
 
         ##
         ## Fetch a list of all the age groups for the current season.
@@ -215,10 +224,6 @@ module.controller 'SportilyRegistrationCtrl', [
 
         # initialise the scope with necessary data.
         fetchSeasons();
-
-        Settings.getList( organisation_id: $scope.organisationId, name: 'dbs' ).then (s) ->
-            if s.length > 0
-                $scope.dbsSettings = s[0]
 
         $scope.getTeams = (role) ->
           fetchTeams(role.selectedAgeGroupId, role)
