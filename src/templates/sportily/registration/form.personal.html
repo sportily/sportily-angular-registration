@@ -48,6 +48,16 @@
     <info>If member has no relevant medical conditions, please indicate 'None'.</info>
 </field>
 
+<!-- no photography -->
+<field name="No Photography" style="margin-top: 20px; display: block;">
+    <input type="checkbox"
+        name="no_photography"
+        ng-model="member.no_photography"
+        style="margin-top: 10px; width: 24px; height: 24px; cursor: pointer;"
+        server-error>
+    <info>Check this box if no photography is permitted for this member.</info>
+</field>
+
 <!-- dbs number -->
 <field name="dbs number" label="DBS registration number">
     <input type="text" class="form-control"

@@ -190,6 +190,16 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "    <info>If member has no relevant medical conditions, please indicate 'None'.</info>\n" +
     "</field>\n" +
     "\n" +
+    "<!-- no photography -->\n" +
+    "<field name=\"No Photography\" style=\"margin-top: 20px; display: block;\">\n" +
+    "    <input type=\"checkbox\"\n" +
+    "        name=\"no_photography\"\n" +
+    "        ng-model=\"member.no_photography\"\n" +
+    "        style=\"margin-top: 10px; width: 24px; height: 24px; cursor: pointer;\"\n" +
+    "        server-error>\n" +
+    "    <info>Check this box if no photography is permitted for this member.</info>\n" +
+    "</field>\n" +
+    "\n" +
     "<!-- dbs number -->\n" +
     "<field name=\"dbs number\" label=\"DBS registration number\">\n" +
     "    <input type=\"text\" class=\"form-control\"\n" +

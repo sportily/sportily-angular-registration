@@ -19,6 +19,9 @@
       $scope.person = {
         marketing_opt_in: false
       };
+      $scope.member = {
+        no_photography: false
+      };
       $scope.roles = [
         {
           type: null
@@ -221,6 +224,7 @@
         if ($scope.state.selectedSeason) {
           $scope.member = {
             season_id: $scope.state.selectedSeason,
+            no_photography: false,
             customRegistrationFields: {
               data: []
             }

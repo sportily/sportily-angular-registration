@@ -24,6 +24,8 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.user = {}
         $scope.person =
           marketing_opt_in:false
+        $scope.member =
+          no_photography: false
         $scope.roles = [ type: null ]
         $scope.complete = false
 
@@ -220,7 +222,7 @@ module.controller 'SportilyRegistrationCtrl', [
 
         $scope.$watch 'state.selectedSeason', (value) ->
             if $scope.state.selectedSeason
-              $scope.member = season_id: $scope.state.selectedSeason, customRegistrationFields: data: []
+              $scope.member = season_id: $scope.state.selectedSeason, no_photography: false, customRegistrationFields: data: []
               fetchOrganisation()
               fetchAgeGroups()
 
