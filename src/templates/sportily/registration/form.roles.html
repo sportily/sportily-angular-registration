@@ -22,7 +22,7 @@
 
     <div class="form-group" ng-show="state.selectedRegionId">
         <select class="form-control"
-            ng-options="type.system_role as type.organisation_role for type in typeOptions[state.selectedRegionId].data"
+            ng-options="type.system_role as type.organisation_role for type in (typeOptions[state.selectedRegionId].data || typeOptions[organisationId].data || [])"
             ng-model="role.type">
             <option value="">Role&hellip;</option>
         </select>
@@ -32,7 +32,7 @@
         <span>for</span>
         <select class="form-control"
             ng-options="team.id as team.name for team in role.teams"
-            ng-model="role.team_id" ng-required="types[role.type].requiresTeam">
+            ng-model="role.team_id" ng-required="requiresTeam(role.type)">
             <option value="">Team&hellip;</option>
         </select>
     </div>

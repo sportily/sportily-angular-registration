@@ -26,12 +26,16 @@ module.controller 'SportilyRegistrationCtrl', [
           marketing_opt_in:false
         $scope.member =
           no_photography: false
+          parent_email: ''
         $scope.roles = [ type: null ]
         $scope.complete = false
+        $scope.hasParentalConsentForm = false
+        $scope.isUnder18 = false
 
         fetchRoles = () ->
+            parentOrgId = if $scope.organisation && $scope.organisation.parent_id then $scope.organisation.parent_id else $scope.organisationId
             RegistrationRoles.one('register').get({
-              'organisation_id': $scope.organisationId,
+              'parent_organisation_id': parentOrgId,
               'email': $scope.user.email,
               'season_id': $scope.state.selectedSeason
               }).then (roles) ->
@@ -53,12 +57,18 @@ module.controller 'SportilyRegistrationCtrl', [
           return false
 
         findRole = (type) ->
-           return _($scope.typeOptions[$scope.state.selectedRegionId].data).find (t) ->
+           return null unless type && $scope.typeOptions
+           regionRoles = $scope.typeOptions[$scope.state.selectedRegionId]?.data or
+                         $scope.typeOptions[$scope.organisationId]?.data or
+                         $scope.typeOptions.data or
+                         []
+           return _(regionRoles).find (t) ->
             return t.system_role == type
 
         $scope.requiresTeam = (type) ->
+          return false unless type
           role = findRole(type)
-          return role && role.requires_team
+          return !!(role && role.requires_team)
 
         ##
         ## Add a new, undefined, role to the scope.
@@ -78,8 +88,9 @@ module.controller 'SportilyRegistrationCtrl', [
         ## Verify that at least one of the roles is valid.
         ##
         roleIsValid = (role) ->
+            return false unless role && role.type
             rule = findRole(role.type)
-            role.type && (!rule.requires_team || role.team_id)
+            Boolean(rule && (!rule.requires_team || role.team_id))
         verifyRoles = ->
             valid =  _.some $scope.roles, roleIsValid
             throw NO_VALID_ROLES_MESSAGE unless valid
@@ -122,17 +133,31 @@ module.controller 'SportilyRegistrationCtrl', [
         ##
         fetchOrganisation = ->
             Organisations.one($scope.organisationId).get({include: 'regions'}).then (organisation) ->
+                $scope.organisation = organisation
                 $scope.regions = organisation.regions.data.map (r) ->
                   id: r.id, name: r.name
                 $scope.regions.unshift id: organisation.id, name: organisation.name
                 $scope.activeCompetitionId = organisation.active_competition_id
                 $scope.state.selectedRegionId = organisation.id if !organisation.regions.data.length
+                $scope.hasParentalConsentForm = organisation.has_parental_consent_form || false
+                checkParentalConsentForms(organisation)
                 CustomRegistrationFields.getList({
                     'organisation_id': organisation.id,
                     'parent_organisation_id': organisation.parent_id,
                     'show_on_registration_form': 1
                 }).then (fields) ->
                     $scope.customRegistrationFields = fields
+
+        checkParentalConsentForms = (organisation) ->
+            return if $scope.hasParentalConsentForm
+            params = organisation_id: organisation.id
+            SportilyApi.all('question-forms').getList(params).then (forms) ->
+                if _.some(forms, (f) -> f.isParentalConsent)
+                    $scope.hasParentalConsentForm = true
+                else if organisation.parent_id
+                    SportilyApi.all('question-forms').getList(organisation_id: organisation.parent_id).then (parentForms) ->
+                        if _.some(parentForms, (f) -> f.isParentalConsent && f.shareWithChildOrganisations)
+                            $scope.hasParentalConsentForm = true
 
 
         ##
@@ -222,7 +247,8 @@ module.controller 'SportilyRegistrationCtrl', [
 
         $scope.$watch 'state.selectedSeason', (value) ->
             if $scope.state.selectedSeason
-              $scope.member = season_id: $scope.state.selectedSeason, no_photography: false, customRegistrationFields: data: []
+              currentParentEmail = if $scope.member then ($scope.member.parent_email || '') else ''
+              $scope.member = season_id: $scope.state.selectedSeason, no_photography: false, parent_email: currentParentEmail, customRegistrationFields: data: []
               fetchOrganisation()
               fetchAgeGroups()
 
@@ -247,6 +273,10 @@ module.controller 'SportilyRegistrationCtrl', [
                 when value instanceof Date then moment(value)
                 else moment(value, input, true)
 
-            $scope.person.date_of_birth = dob.format output if dob.isValid()
+            if dob.isValid()
+                $scope.person.date_of_birth = dob.format output
+                $scope.isUnder18 = moment().diff(dob, 'years') < 18
+            else
+                $scope.isUnder18 = false
             $scope.form['date_of_birth'].$setValidity 'date', dob.isValid() if $scope.form['date_of_birth']
 ]

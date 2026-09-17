@@ -190,6 +190,17 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "    <info>If member has no relevant medical conditions, please indicate 'None'.</info>\n" +
     "</field>\n" +
     "\n" +
+    "<!-- parent email address -->\n" +
+    "<field name=\"parent_email\" label=\"Parent Email Address\" ng-if=\"hasParentalConsentForm\">\n" +
+    "    <input type=\"email\" class=\"form-control\"\n" +
+    "        name=\"parent_email\"\n" +
+    "        ng-model=\"member.parent_email\"\n" +
+    "        placeholder=\"Parent Email Address\"\n" +
+    "        ng-required=\"isUnder18\"\n" +
+    "        server-error>\n" +
+    "    <info ng-if=\"isUnder18\">Parent email is mandatory for members under 18.</info>\n" +
+    "</field>\n" +
+    "\n" +
     "<!-- no photography -->\n" +
     "<field name=\"No Photography\" style=\"margin-top: 20px; display: block;\">\n" +
     "    <input type=\"checkbox\"\n" +
@@ -511,7 +522,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "\n" +
     "    <div class=\"form-group\" ng-show=\"state.selectedRegionId\">\n" +
     "        <select class=\"form-control\"\n" +
-    "            ng-options=\"type.system_role as type.organisation_role for type in typeOptions[state.selectedRegionId].data\"\n" +
+    "            ng-options=\"type.system_role as type.organisation_role for type in (typeOptions[state.selectedRegionId].data || typeOptions[organisationId].data || [])\"\n" +
     "            ng-model=\"role.type\">\n" +
     "            <option value=\"\">Role&hellip;</option>\n" +
     "        </select>\n" +
@@ -521,7 +532,7 @@ angular.module("templates/sportily/registration/form.roles.html", []).run(["$tem
     "        <span>for</span>\n" +
     "        <select class=\"form-control\"\n" +
     "            ng-options=\"team.id as team.name for team in role.teams\"\n" +
-    "            ng-model=\"role.team_id\" ng-required=\"types[role.type].requiresTeam\">\n" +
+    "            ng-model=\"role.team_id\" ng-required=\"requiresTeam(role.type)\">\n" +
     "            <option value=\"\">Team&hellip;</option>\n" +
     "        </select>\n" +
     "    </div>\n" +

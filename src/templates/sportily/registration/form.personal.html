@@ -48,6 +48,17 @@
     <info>If member has no relevant medical conditions, please indicate 'None'.</info>
 </field>
 
+<!-- parent email address -->
+<field name="parent_email" label="Parent Email Address" ng-if="hasParentalConsentForm">
+    <input type="email" class="form-control"
+        name="parent_email"
+        ng-model="member.parent_email"
+        placeholder="Parent Email Address"
+        ng-required="isUnder18"
+        server-error>
+    <info ng-if="isUnder18">Parent email is mandatory for members under 18.</info>
+</field>
+
 <!-- no photography -->
 <field name="No Photography" style="margin-top: 20px; display: block;">
     <input type="checkbox"

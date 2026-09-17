@@ -14,13 +14,14 @@
 
   module.controller('SportilyRegistrationCtrl', [
     '$scope', '$q', 'Form', 'AgeGroups', 'Organisations', 'Members', 'People', 'Roles', 'Seasons', 'Teams', 'RegistrationRoles', 'Users', 'CustomRegistrationFields', 'SportilyApi', function($scope, $q, Form, AgeGroups, Organisations, Members, People, Roles, Seasons, Teams, RegistrationRoles, Users, CustomRegistrationFields, SportilyApi) {
-      var fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveAll, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
+      var checkParentalConsentForms, fetchAgeGroups, fetchMember, fetchOrganisation, fetchRoles, fetchSeasons, fetchTeams, findRole, roleIsValid, saveAll, saveMember, savePerson, saveRoles, saveUser, verifyRoles;
       $scope.user = {};
       $scope.person = {
         marketing_opt_in: false
       };
       $scope.member = {
-        no_photography: false
+        no_photography: false,
+        parent_email: ''
       };
       $scope.roles = [
         {
@@ -28,9 +29,13 @@
         }
       ];
       $scope.complete = false;
+      $scope.hasParentalConsentForm = false;
+      $scope.isUnder18 = false;
       fetchRoles = function() {
+        var parentOrgId;
+        parentOrgId = $scope.organisation && $scope.organisation.parent_id ? $scope.organisation.parent_id : $scope.organisationId;
         return RegistrationRoles.one('register').get({
-          'organisation_id': $scope.organisationId,
+          'parent_organisation_id': parentOrgId,
           'email': $scope.user.email,
           'season_id': $scope.state.selectedSeason
         }).then(function(roles) {
@@ -56,14 +61,22 @@
         return false;
       };
       findRole = function(type) {
-        return _($scope.typeOptions[$scope.state.selectedRegionId].data).find(function(t) {
+        var ref, ref1, regionRoles;
+        if (!(type && $scope.typeOptions)) {
+          return null;
+        }
+        regionRoles = ((ref = $scope.typeOptions[$scope.state.selectedRegionId]) != null ? ref.data : void 0) || ((ref1 = $scope.typeOptions[$scope.organisationId]) != null ? ref1.data : void 0) || $scope.typeOptions.data || [];
+        return _(regionRoles).find(function(t) {
           return t.system_role === type;
         });
       };
       $scope.requiresTeam = function(type) {
         var role;
+        if (!type) {
+          return false;
+        }
         role = findRole(type);
-        return role && role.requires_team;
+        return !!(role && role.requires_team);
       };
       $scope.addRole = function() {
         return $scope.roles.push({
@@ -77,8 +90,11 @@
       };
       roleIsValid = function(role) {
         var rule;
+        if (!(role && role.type)) {
+          return false;
+        }
         rule = findRole(role.type);
-        return role.type && (!rule.requires_team || role.team_id);
+        return Boolean(rule && (!rule.requires_team || role.team_id));
       };
       verifyRoles = function() {
         var valid;
@@ -126,6 +142,7 @@
         return Organisations.one($scope.organisationId).get({
           include: 'regions'
         }).then(function(organisation) {
+          $scope.organisation = organisation;
           $scope.regions = organisation.regions.data.map(function(r) {
             return {
               id: r.id,
@@ -140,6 +157,8 @@
           if (!organisation.regions.data.length) {
             $scope.state.selectedRegionId = organisation.id;
           }
+          $scope.hasParentalConsentForm = organisation.has_parental_consent_form || false;
+          checkParentalConsentForms(organisation);
           return CustomRegistrationFields.getList({
             'organisation_id': organisation.id,
             'parent_organisation_id': organisation.parent_id,
@@ -147,6 +166,32 @@
           }).then(function(fields) {
             return $scope.customRegistrationFields = fields;
           });
+        });
+      };
+      checkParentalConsentForms = function(organisation) {
+        var params;
+        if ($scope.hasParentalConsentForm) {
+          return;
+        }
+        params = {
+          organisation_id: organisation.id
+        };
+        return SportilyApi.all('question-forms').getList(params).then(function(forms) {
+          if (_.some(forms, function(f) {
+            return f.isParentalConsent;
+          })) {
+            return $scope.hasParentalConsentForm = true;
+          } else if (organisation.parent_id) {
+            return SportilyApi.all('question-forms').getList({
+              organisation_id: organisation.parent_id
+            }).then(function(parentForms) {
+              if (_.some(parentForms, function(f) {
+                return f.isParentalConsent && f.shareWithChildOrganisations;
+              })) {
+                return $scope.hasParentalConsentForm = true;
+              }
+            });
+          }
         });
       };
       fetchAgeGroups = function() {
@@ -221,10 +266,13 @@
         return fetchTeams(role.selectedAgeGroupId, role);
       };
       $scope.$watch('state.selectedSeason', function(value) {
+        var currentParentEmail;
         if ($scope.state.selectedSeason) {
+          currentParentEmail = $scope.member ? $scope.member.parent_email || '' : '';
           $scope.member = {
             season_id: $scope.state.selectedSeason,
             no_photography: false,
+            parent_email: currentParentEmail,
             customRegistrationFields: {
               data: []
             }
@@ -266,6 +314,9 @@
         })();
         if (dob.isValid()) {
           $scope.person.date_of_birth = dob.format(output);
+          $scope.isUnder18 = moment().diff(dob, 'years') < 18;
+        } else {
+          $scope.isUnder18 = false;
         }
         if ($scope.form['date_of_birth']) {
           return $scope.form['date_of_birth'].$setValidity('date', dob.isValid());
