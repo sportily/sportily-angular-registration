@@ -59,14 +59,18 @@
     <info ng-if="isUnder18">Parent email is mandatory for members under 18.</info>
 </field>
 
-<!-- no photography -->
-<field name="No Photography" style="margin-top: 20px; display: block;">
-    <input type="checkbox"
-        name="no_photography"
-        ng-model="member.no_photography"
-        style="margin-top: 10px; width: 24px; height: 24px; cursor: pointer;"
+<!-- photography -->
+<field name="photography" label="Photography">
+    <select class="form-control"
+        name="photography"
+        ng-model="member.photography"
+        required
         server-error>
-    <info>Check this box if no photography is permitted for this member.</info>
+        <option value="">-- Please Select --</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+    <info>Please select whether photography is permitted for this member.</info>
 </field>
 
 <!-- dbs number -->

@@ -20,7 +20,8 @@
         marketing_opt_in: false
       };
       $scope.member = {
-        no_photography: false,
+        photography: null,
+        no_photography: null,
         parent_email: ''
       };
       $scope.roles = [
@@ -225,6 +226,9 @@
           }
           return r;
         });
+        if (($scope.member.photography != null) && $scope.member.photography !== '') {
+          $scope.member.no_photography = $scope.member.photography === 'no' || $scope.member.photography === 'false' || $scope.member.photography === false;
+        }
         data = {
           user: $scope.user,
           person: $scope.person,
@@ -266,12 +270,15 @@
         return fetchTeams(role.selectedAgeGroupId, role);
       };
       $scope.$watch('state.selectedSeason', function(value) {
-        var currentParentEmail;
+        var currentNoPhotography, currentParentEmail, currentPhotography;
         if ($scope.state.selectedSeason) {
           currentParentEmail = $scope.member ? $scope.member.parent_email || '' : '';
+          currentPhotography = $scope.member ? $scope.member.photography : null;
+          currentNoPhotography = $scope.member ? $scope.member.no_photography : null;
           $scope.member = {
             season_id: $scope.state.selectedSeason,
-            no_photography: false,
+            photography: currentPhotography,
+            no_photography: currentNoPhotography,
             parent_email: currentParentEmail,
             customRegistrationFields: {
               data: []
@@ -300,7 +307,7 @@
         $scope.member.customRegistrationFields.data.push(f);
         return f;
       };
-      return $scope.$watch('state.dateOfBirth', function(value) {
+      $scope.$watch('state.dateOfBirth', function(value) {
         var dob, input, output;
         input = 'DD/MM/YYYY';
         output = 'YYYY-MM-DD';
@@ -320,6 +327,13 @@
         }
         if ($scope.form['date_of_birth']) {
           return $scope.form['date_of_birth'].$setValidity('date', dob.isValid());
+        }
+      });
+      return $scope.$watch('member.photography', function(value) {
+        if ((value != null) && value !== '') {
+          return $scope.member.no_photography = value === 'no' || value === 'false' || value === false;
+        } else if ($scope.member) {
+          return $scope.member.no_photography = null;
         }
       });
     }
@@ -540,9 +554,13 @@
           if (response.data) {
             scope.error = response.data.error_description;
             return _.each(response.data.validation_messages, function(errors, key) {
-              return _.each(errors, function(error) {
-                return scope.form[key].$setValidity(error, false);
-              });
+              var targetKey;
+              targetKey = !scope.form[key] && key === 'no_photography' && scope.form['photography'] ? 'photography' : key;
+              if (scope.form[targetKey]) {
+                return _.each(errors, function(error) {
+                  return scope.form[targetKey].$setValidity(error, false);
+                });
+              }
             });
           } else {
             return scope.error = response;

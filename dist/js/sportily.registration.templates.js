@@ -201,14 +201,18 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "    <info ng-if=\"isUnder18\">Parent email is mandatory for members under 18.</info>\n" +
     "</field>\n" +
     "\n" +
-    "<!-- no photography -->\n" +
-    "<field name=\"No Photography\" style=\"margin-top: 20px; display: block;\">\n" +
-    "    <input type=\"checkbox\"\n" +
-    "        name=\"no_photography\"\n" +
-    "        ng-model=\"member.no_photography\"\n" +
-    "        style=\"margin-top: 10px; width: 24px; height: 24px; cursor: pointer;\"\n" +
+    "<!-- photography -->\n" +
+    "<field name=\"photography\" label=\"Photography\">\n" +
+    "    <select class=\"form-control\"\n" +
+    "        name=\"photography\"\n" +
+    "        ng-model=\"member.photography\"\n" +
+    "        required\n" +
     "        server-error>\n" +
-    "    <info>Check this box if no photography is permitted for this member.</info>\n" +
+    "        <option value=\"\">-- Please Select --</option>\n" +
+    "        <option value=\"yes\">Yes</option>\n" +
+    "        <option value=\"no\">No</option>\n" +
+    "    </select>\n" +
+    "    <info>Please select whether photography is permitted for this member.</info>\n" +
     "</field>\n" +
     "\n" +
     "<!-- dbs number -->\n" +

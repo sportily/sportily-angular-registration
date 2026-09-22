@@ -67,8 +67,10 @@ module.factory 'Form', ($window, $q) ->
             if response.data
                 scope.error = response.data.error_description
                 _.each response.data.validation_messages, (errors, key) ->
-                    _.each errors, (error) ->
-                        scope.form[key].$setValidity error, false
+                    targetKey = if !scope.form[key] && key == 'no_photography' && scope.form['photography'] then 'photography' else key
+                    if scope.form[targetKey]
+                        _.each errors, (error) ->
+                            scope.form[targetKey].$setValidity error, false
             else
                 scope.error = response
 

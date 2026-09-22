@@ -25,7 +25,8 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.person =
           marketing_opt_in:false
         $scope.member =
-          no_photography: false
+          photography: null
+          no_photography: null
           parent_email: ''
         $scope.roles = [ type: null ]
         $scope.complete = false
@@ -186,6 +187,9 @@ module.controller 'SportilyRegistrationCtrl', [
                 r.competition_id = $scope.activeCompetitionId if rule && !rule.requires_team
                 r
 
+            if $scope.member.photography? && $scope.member.photography != ''
+                $scope.member.no_photography = ($scope.member.photography == 'no' || $scope.member.photography == 'false' || $scope.member.photography == false)
+
             data = 
                 user: $scope.user,
                 person: $scope.person,
@@ -248,7 +252,14 @@ module.controller 'SportilyRegistrationCtrl', [
         $scope.$watch 'state.selectedSeason', (value) ->
             if $scope.state.selectedSeason
               currentParentEmail = if $scope.member then ($scope.member.parent_email || '') else ''
-              $scope.member = season_id: $scope.state.selectedSeason, no_photography: false, parent_email: currentParentEmail, customRegistrationFields: data: []
+              currentPhotography = if $scope.member then $scope.member.photography else null
+              currentNoPhotography = if $scope.member then $scope.member.no_photography else null
+              $scope.member =
+                season_id: $scope.state.selectedSeason
+                photography: currentPhotography
+                no_photography: currentNoPhotography
+                parent_email: currentParentEmail
+                customRegistrationFields: data: []
               fetchOrganisation()
               fetchAgeGroups()
 
@@ -279,4 +290,10 @@ module.controller 'SportilyRegistrationCtrl', [
             else
                 $scope.isUnder18 = false
             $scope.form['date_of_birth'].$setValidity 'date', dob.isValid() if $scope.form['date_of_birth']
+
+        $scope.$watch 'member.photography', (value) ->
+            if value? && value != ''
+                $scope.member.no_photography = (value == 'no' || value == 'false' || value == false)
+            else if $scope.member
+                $scope.member.no_photography = null
 ]

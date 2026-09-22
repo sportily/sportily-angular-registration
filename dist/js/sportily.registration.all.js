@@ -20,7 +20,8 @@
         marketing_opt_in: false
       };
       $scope.member = {
-        no_photography: false,
+        photography: null,
+        no_photography: null,
         parent_email: ''
       };
       $scope.roles = [
@@ -225,6 +226,9 @@
           }
           return r;
         });
+        if (($scope.member.photography != null) && $scope.member.photography !== '') {
+          $scope.member.no_photography = $scope.member.photography === 'no' || $scope.member.photography === 'false' || $scope.member.photography === false;
+        }
         data = {
           user: $scope.user,
           person: $scope.person,
@@ -266,12 +270,15 @@
         return fetchTeams(role.selectedAgeGroupId, role);
       };
       $scope.$watch('state.selectedSeason', function(value) {
-        var currentParentEmail;
+        var currentNoPhotography, currentParentEmail, currentPhotography;
         if ($scope.state.selectedSeason) {
           currentParentEmail = $scope.member ? $scope.member.parent_email || '' : '';
+          currentPhotography = $scope.member ? $scope.member.photography : null;
+          currentNoPhotography = $scope.member ? $scope.member.no_photography : null;
           $scope.member = {
             season_id: $scope.state.selectedSeason,
-            no_photography: false,
+            photography: currentPhotography,
+            no_photography: currentNoPhotography,
             parent_email: currentParentEmail,
             customRegistrationFields: {
               data: []
@@ -300,7 +307,7 @@
         $scope.member.customRegistrationFields.data.push(f);
         return f;
       };
-      return $scope.$watch('state.dateOfBirth', function(value) {
+      $scope.$watch('state.dateOfBirth', function(value) {
         var dob, input, output;
         input = 'DD/MM/YYYY';
         output = 'YYYY-MM-DD';
@@ -320,6 +327,13 @@
         }
         if ($scope.form['date_of_birth']) {
           return $scope.form['date_of_birth'].$setValidity('date', dob.isValid());
+        }
+      });
+      return $scope.$watch('member.photography', function(value) {
+        if ((value != null) && value !== '') {
+          return $scope.member.no_photography = value === 'no' || value === 'false' || value === false;
+        } else if ($scope.member) {
+          return $scope.member.no_photography = null;
         }
       });
     }
@@ -540,9 +554,13 @@
           if (response.data) {
             scope.error = response.data.error_description;
             return _.each(response.data.validation_messages, function(errors, key) {
-              return _.each(errors, function(error) {
-                return scope.form[key].$setValidity(error, false);
-              });
+              var targetKey;
+              targetKey = !scope.form[key] && key === 'no_photography' && scope.form['photography'] ? 'photography' : key;
+              if (scope.form[targetKey]) {
+                return _.each(errors, function(error) {
+                  return scope.form[targetKey].$setValidity(error, false);
+                });
+              }
             });
           } else {
             return scope.error = response;
@@ -867,14 +885,18 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "    <info ng-if=\"isUnder18\">Parent email is mandatory for members under 18.</info>\n" +
     "</field>\n" +
     "\n" +
-    "<!-- no photography -->\n" +
-    "<field name=\"No Photography\" style=\"margin-top: 20px; display: block;\">\n" +
-    "    <input type=\"checkbox\"\n" +
-    "        name=\"no_photography\"\n" +
-    "        ng-model=\"member.no_photography\"\n" +
-    "        style=\"margin-top: 10px; width: 24px; height: 24px; cursor: pointer;\"\n" +
+    "<!-- photography -->\n" +
+    "<field name=\"photography\" label=\"Photography\">\n" +
+    "    <select class=\"form-control\"\n" +
+    "        name=\"photography\"\n" +
+    "        ng-model=\"member.photography\"\n" +
+    "        required\n" +
     "        server-error>\n" +
-    "    <info>Check this box if no photography is permitted for this member.</info>\n" +
+    "        <option value=\"\">-- Please Select --</option>\n" +
+    "        <option value=\"yes\">Yes</option>\n" +
+    "        <option value=\"no\">No</option>\n" +
+    "    </select>\n" +
+    "    <info>Please select whether photography is permitted for this member.</info>\n" +
     "</field>\n" +
     "\n" +
     "<!-- dbs number -->\n" +
