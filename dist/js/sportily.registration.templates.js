@@ -191,7 +191,7 @@ angular.module("templates/sportily/registration/form.personal.html", []).run(["$
     "</field>\n" +
     "\n" +
     "<!-- parent email address -->\n" +
-    "<field name=\"parent_email\" label=\"Parent Email Address\" ng-if=\"hasParentalConsentForm\">\n" +
+    "<field name=\"parent_email\" label=\"Parent Email Address\" ng-if=\"hasParentalConsentForm && isUnder18\">\n" +
     "    <input type=\"email\" class=\"form-control\"\n" +
     "        name=\"parent_email\"\n" +
     "        ng-model=\"member.parent_email\"\n" +
